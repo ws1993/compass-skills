@@ -19,7 +19,7 @@ This skill guarantees 3 things:
 3. Let the user see that the AI has fully understood the requirement.
 
 **Use case 2: during and after work, automatically build a task tree / task forest.**
-Use `$task-forest` to automatically convert current-session goals, progress, deviations, dependencies, todos, and decisions into a proposal. After approval, it exports a tree view, DAG view, task detail cards, and a recommended queue so the next agent or next session knows why the task exists, what changed, and what to do next.
+Use `$task-forest` to automatically decompose the current session into tasks, then record each task's goals, progress, deviations, dependencies, todos, and decisions as a proposal. After approval, it exports a tree view, DAG view, task detail cards, and a recommended queue so the next agent or next session knows why the task exists, what changed, and what to do next.
 
 **Use case 3: over long-term collaboration, personalize without overreaching.**
 Use `$user-profile-keeper` to store an auditable, correctable, retractable local collaboration profile. It does not save secrets or upload data; `$task-clarifier` can read a low-risk summary to ask questions in a way that fits the user. Without a profile, `$task-clarifier` still works normally and provides strong alignment.
@@ -64,8 +64,8 @@ If you are new to `SKILL.md` skills, start with the Chinese static tutorial: [Ho
 
 ```text
 $user-profile-keeper answers: who is the user and how should we collaborate?
-$task-forest answers: where does this task fit and what changed?
-$task-clarifier answers: should we do this, and how do we avoid drifting?
+$task-forest answers: where does this task fit, how far has it progressed, why does it exist, and whether it is drifting from the overall goal?
+$task-clarifier answers: what exactly is the user's requirement?
 ```
 
 ## Ecosystem DAG
@@ -224,14 +224,6 @@ Coming next:
 ## License
 
 This project is released under the MIT License. See [LICENSE](LICENSE).
-
-## Pre-Release Checklist
-
-- [x] Choose and add an open-source license.
-- [ ] Confirm installation paths for the target distribution channel.
-- [ ] Run Python compile checks and the `$task-forest` clean-room export validation.
-- [ ] Scan for private paths, tokens, credentials, internal logs, and runtime residue.
-- [ ] Test the three prompts in a fresh workspace.
 
 ## Community Discussion
 
