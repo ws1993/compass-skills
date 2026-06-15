@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Local, auditable user-profile store for Codex skills."""
+"""Local, auditable user-profile store for agent skills."""
 
 from __future__ import annotations
 
@@ -19,7 +19,6 @@ from typing import Any
 DEFAULT_BASE_DIR = Path.home() / ".compass-skills" / "user-profiles" / "v1"
 BASE_DIR = Path(
     os.environ.get("COMPASS_USER_PROFILE_HOME")
-    or os.environ.get("CODEX_USER_PROFILE_HOME")
     or DEFAULT_BASE_DIR
 ).expanduser()
 VALID_SOURCE_TYPES = {"self_report", "observed", "inferred", "correction"}

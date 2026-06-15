@@ -16,6 +16,8 @@ Scope:
 - Replaced fixed installed-skill command examples with `<skill-dir>` placeholders.
 - Changed the default user-profile storage path to `<home>/.compass-skills/user-profiles/v1`.
 - Generalized task-forest validation sample data and UI title-shortening rules.
+- Generalized Codex-first wording and defaults into agent-agnostic `SKILL.md` usage, with `COMPASS_AGENT_NAME` for actor labeling and `COMPASS_USER_PROFILE_HOME` for profile storage overrides.
+- Added public visual assets with sanitized or generated demo data. Full source screenshots that may contain internal task text are excluded by `.gitignore`.
 
 ## Local-First Boundaries
 

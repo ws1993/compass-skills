@@ -46,3 +46,7 @@ id_ed25519*
 *.tar
 *.tar.gz
 *.tgz
+
+# Private source screenshots used only to derive sanitized public assets
+/assets/html.png
+/assets/dag.png

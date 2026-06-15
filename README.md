@@ -7,7 +7,32 @@
 
 让 AI 懂你、看全局、不跑偏。COMPASS 把用户画像、任务图谱和需求对齐合成一个可复用的 skills system，让长任务、跨 session 协作和多 agent 工作不再散落在聊天记录里。
 
-![task-forest demo](assets/task-forest-demo.gif)
+## 30 秒看懂它怎么有用
+
+**场景 1：任务开始前，先避免做错。**
+当需求模糊、成本高或有安全风险时，用 `$task-clarifier` 先判断应该直接做、先查证、问用户、确认风险还是暂停。它的价值不是多问问题，而是只问会改变执行路径的问题。
+
+**场景 2：任务进行中和结束后，自动沉淀任务地图。**
+用 `$task-forest` 把当前 session 的目标、进度、偏差、依赖、待办和决策写成 proposal。确认后生成树视图、DAG 视图、任务详情卡和推荐队列，让下一个 agent 或下一个 session 继续时知道“这件事为什么做、做到哪、下一步做什么”。
+
+**场景 3：长期协作中，让 AI 越来越懂你但不越界。**
+用 `$user-profile-keeper` 在本地保存可审计、可纠错、可撤回的协作画像。它只保存用户确认或低敏的协作信号，不保存 secret，不上传数据；`task-clarifier` 只读取低敏摘要来减少无效澄清。
+
+树视图与 session 更新流程：
+
+![task-forest tree demo](assets/task-forest-demo.gif)
+
+DAG 关系视图：
+
+![task-forest DAG view](assets/task-forest-dag-view.png)
+
+任务详情、目的、要求、证据和调度建议：
+
+![task-forest detail view](assets/task-forest-detail-view.png)
+
+用户画像与需求对齐的协作方式：
+
+![profile and clarifier flow](assets/profile-clarifier-flow.png)
 
 ## 为什么需要 COMPASS
 
@@ -64,7 +89,7 @@ flowchart TD
 
 ![COMPASS system map](assets/compass-system-map.svg)
 
-## 安装和平台兼容
+## 安装和 Agent 兼容
 
 这三个 skills 使用 Python 标准库和 Markdown 文档，不依赖云服务，不上传用户数据。脚本按本地文件工作，已按 macOS、Windows、Linux 三类环境做路径约束：
 
@@ -74,7 +99,17 @@ flowchart TD
 - `user-profile-keeper` 数据默认保存在用户目录下的 `.compass-skills/user-profiles/v1`，可用 `COMPASS_USER_PROFILE_HOME` 改到其他本地目录。
 - 所有正式写入都在本地文件或本地 SQLite 内完成；没有网络上传、浏览器 cookie 读取、credential 读取或远程写入。
 
-安装方式取决于你的 Codex/skills 环境。通用做法是把 `skills/` 下的三个目录复制到你的本地 skills 目录，然后在 session 中点名使用：
+COMPASS 不是 Codex-only。它是一个 agent-agnostic 的 `SKILL.md` skills 包：凡是支持 `SKILL.md`、YAML frontmatter、Markdown instructions、可选 `scripts/` / `references/` 的 agent，都可以原生或近原生使用；暂不原生支持 skills 的 agent，可以通过根目录 [AGENTS.md](AGENTS.md) 做轻量适配。
+
+| Agent / 环境 | 推荐接入方式 |
+| --- | --- |
+| Codex | 复制 `skills/` 下的三个目录到 Codex 可发现的 skills 目录，或作为 repo-local skills 使用。 |
+| Claude Code | 复制 `skills/` 下的三个目录到 Claude Code 的 custom skills 目录，或放入项目 skills 根目录。 |
+| OpenClaw | 放入 workspace `skills/`、`.agents/skills` 或个人/托管 skills 目录；按 OpenClaw 的 skill precedence 生效。 |
+| OpenCode | 保留本 repo 的 `skills/` 和 [AGENTS.md](AGENTS.md)，让 agent 通过 AGENTS 规则发现并读取对应 `SKILL.md`。 |
+| 其他 agent | 只要能读取文件并运行本地脚本，就按 [AGENTS.md](AGENTS.md) 的通用协议加载：先读 `SKILL.md`，再按需读 `references/` 和运行 `scripts/`。 |
+
+通用做法是把 `skills/` 下的三个目录复制到目标 agent 的本地 skills 目录，然后在 session 中点名使用：
 
 ```text
 $user-profile-keeper
@@ -184,4 +219,3 @@ COMPASS 的默认安全边界：
 - [ ] 运行 Python 编译检查和 task-forest 从零构建验证。
 - [ ] 扫描是否包含私有路径、token、credential、内部日志或运行残留。
 - [ ] 在一个全新 workspace 里试用三个 prompt。
-

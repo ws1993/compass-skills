@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="960" viewBox="0 0 1600 960" role="img" aria-labelledby="title desc">
+  <title id="title">Task Forest task detail and scheduling view</title>
+  <desc id="desc">A sanitized product-style task detail view showing generated purpose, requirements, evidence, risks, and recommended next actions.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f7f9fd; }
+      .panel { fill: #ffffff; stroke: #d6deea; stroke-width: 2; }
+      .soft { fill: #f2f6fd; }
+      .title { fill: #111827; font-family: Arial, Helvetica, sans-serif; font-size: 42px; font-weight: 700; }
+      .h2 { fill: #111827; font-family: Arial, Helvetica, sans-serif; font-size: 26px; font-weight: 700; }
+      .label { fill: #607086; font-family: Arial, Helvetica, sans-serif; font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+      .text { fill: #263244; font-family: Arial, Helvetica, sans-serif; font-size: 24px; }
+      .small { fill: #607086; font-family: Arial, Helvetica, sans-serif; font-size: 20px; }
+      .pill { fill: #eef4ff; stroke: #c7d8ff; stroke-width: 1.5; }
+      .green { fill: #e9f8ef; stroke: #96d5ad; }
+      .blue { fill: #eaf2ff; stroke: #8fb7ff; }
+      .amber { fill: #fff5db; stroke: #ffd37a; }
+      .red { fill: #fff0f0; stroke: #ffb8b8; }
+      .line { stroke: #2f6fed; stroke-width: 8; stroke-linecap: round; }
+      .mutedline { stroke: #d8e0ec; stroke-width: 8; stroke-linecap: round; }
+      .edge { fill: none; stroke: #31a36b; stroke-width: 4; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1600" height="960" rx="28"/>
+  <text class="title" x="64" y="82">Task Forest turns conversations into an auditable task map</text>
+  <text class="small" x="66" y="122">Sanitized demo data: no real workspace, personal profile, path, or private task text.</text>
+
+  <rect class="panel" x="50" y="165" width="440" height="725" rx="22"/>
+  <text class="h2" x="86" y="218">Recommended Queue</text>
+
+  <rect class="soft" x="82" y="255" width="376" height="118" rx="18"/>
+  <text class="label" x="108" y="300">Ready now</text>
+  <text class="text" x="108" y="337">Draft launch checklist</text>
+  <text class="small" x="108" y="366">No unmet dependencies · 45 min</text>
+
+  <rect class="soft" x="82" y="398" width="376" height="118" rx="18"/>
+  <text class="label" x="108" y="443">Review needed</text>
+  <text class="text" x="108" y="480">Confirm acceptance evidence</text>
+  <text class="small" x="108" y="509">Waiting for user decision</text>
+
+  <rect class="soft" x="82" y="541" width="376" height="118" rx="18"/>
+  <text class="label" x="108" y="586">Blocked</text>
+  <text class="text" x="108" y="623">Choose data source</text>
+  <text class="small" x="108" y="652">Needs an external fact</text>
+
+  <rect class="green" x="82" y="705" width="376" height="122" rx="18"/>
+  <text class="label" x="108" y="750">Next action</text>
+  <text class="text" x="108" y="787">Start the ready task first</text>
+  <text class="small" x="108" y="816">Low risk · high dependency value</text>
+
+  <rect class="panel" x="530" y="165" width="500" height="725" rx="22"/>
+  <text class="h2" x="566" y="218">DAG Context</text>
+
+  <g transform="translate(590 280)">
+    <path class="edge" d="M120 115 C175 50 238 58 300 105"/>
+    <path class="edge" d="M120 115 C185 178 238 232 300 260"/>
+    <path class="edge" d="M120 115 C168 292 230 382 300 410"/>
+    <rect class="blue" x="0" y="70" width="230" height="92" rx="16"/>
+    <text class="text" x="28" y="112">Project goal</text>
+    <line class="line" x1="28" y1="138" x2="170" y2="138"/>
+    <line class="mutedline" x1="176" y1="138" x2="205" y2="138"/>
+
+    <rect class="green" x="270" y="55" width="210" height="92" rx="16"/>
+    <text class="text" x="294" y="98">Task card</text>
+    <line class="line" x1="294" y1="123" x2="430" y2="123"/>
+
+    <rect class="amber" x="270" y="220" width="210" height="92" rx="16"/>
+    <text class="text" x="294" y="263">Risk gate</text>
+    <line class="line" x1="294" y1="288" x2="405" y2="288"/>
+    <line class="mutedline" x1="411" y1="288" x2="450" y2="288"/>
+
+    <rect class="green" x="270" y="380" width="210" height="92" rx="16"/>
+    <text class="text" x="294" y="423">Next task</text>
+    <line class="line" x1="294" y1="448" x2="430" y2="448"/>
+  </g>
+
+  <rect class="panel" x="1070" y="165" width="480" height="725" rx="22"/>
+  <text class="h2" x="1106" y="218">Generated Task Card</text>
+
+  <rect class="pill" x="1106" y="248" width="112" height="42" rx="21"/>
+  <text class="small" x="1130" y="276">ready</text>
+  <rect class="green" x="1232" y="248" width="126" height="42" rx="21"/>
+  <text class="small" x="1255" y="276">60%</text>
+  <rect class="amber" x="1372" y="248" width="125" height="42" rx="21"/>
+  <text class="small" x="1394" y="276">P2</text>
+
+  <text class="label" x="1108" y="340">Purpose</text>
+  <text class="text" x="1108" y="380">Convert the session result into a</text>
+  <text class="text" x="1108" y="414">verifiable next step.</text>
+
+  <text class="label" x="1108" y="480">Requirements</text>
+  <text class="text" x="1108" y="520">- Keep data local</text>
+  <text class="text" x="1108" y="558">- Preserve decisions and evidence</text>
+  <text class="text" x="1108" y="596">- Ask before risky changes</text>
+
+  <text class="label" x="1108" y="662">Evidence</text>
+  <text class="text" x="1108" y="702">Session summary, accepted proposal,</text>
+  <text class="text" x="1108" y="736">and validation output.</text>
+
+  <text class="label" x="1108" y="802">Scheduler</text>
+  <text class="text" x="1108" y="842">Recommended next because it is ready,</text>
+  <text class="text" x="1108" y="876">short, and unlocks downstream work.</text>
+</svg>

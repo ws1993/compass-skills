@@ -20,7 +20,7 @@ description: 维护当前任务目录的 repo-local 任务森林或任务 DAG。
 
 ## CLI
 
-从任意目录执行时，使用本 skill 目录下的脚本。下列示例里的 `<skill-dir>` 表示当前 `SKILL.md` 所在目录；在 Codex 中应先按 skill 路径解析到真实目录，再执行脚本：
+从任意目录执行时，使用本 skill 目录下的脚本。下列示例里的 `<skill-dir>` 表示当前 `SKILL.md` 所在目录；在任意 agent 中都应先按当前 skill 路径解析到真实目录，再执行脚本：
 
 ```bash
 python3 <skill-dir>/scripts/task_forest.py --help
@@ -36,6 +36,9 @@ python3 <skill-dir>/scripts/task_forest.py init \
 常用命令：
 
 ```bash
+# 可选：标记本轮写入来自哪个 agent
+export COMPASS_AGENT_NAME=your-agent-name
+
 # 初始化
 python3 <skill-dir>/scripts/task_forest.py init
 

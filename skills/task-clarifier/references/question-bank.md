@@ -130,7 +130,7 @@
 - 目标是 recommendation、pre-install audit、local install、global install，还是 modify before install？
 - 允许权限是什么：read-only clone、本地写、shell、network、package install、credential、global config？
 - 审计要假设 hostile intent，还是只报告确认漏洞？
-- 安装范围是 project-local、Codex-local、user-global，还是 system-wide？
+- 安装范围是 project-local、agent-local、user-global，还是 system-wide？
 - secrets、private repo、browser session、SSH key、token 是否全部 out of scope？
 - 哪些动作需要最终确认：copy files、run scripts、update dashboard、edit config、install dependencies？
 - 是否允许删除、覆盖或迁移现有文件？如果允许，范围和回滚点是什么？

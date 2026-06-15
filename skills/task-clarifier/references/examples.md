@@ -26,7 +26,7 @@
 
 1. 检查是否已 clone 或安装。
 2. 安装前读源码、scripts、references，做轻量安全扫描。
-3. 未说明时询问安装范围：project/Codex/user/system。
+3. 未说明时询问安装范围：project-local、agent-local、user-global、system-wide。
 4. 全局写入、credential、运行不可信脚本、更新 dashboard 前确认。
 
 ## "Find the latest/best related methods"

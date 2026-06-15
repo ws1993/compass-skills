@@ -10,7 +10,7 @@ from urllib.parse import parse_qs
 
 
 TMP_HOME = tempfile.mkdtemp(prefix="upk-smoke-")
-os.environ["CODEX_USER_PROFILE_HOME"] = TMP_HOME
+os.environ["COMPASS_USER_PROFILE_HOME"] = TMP_HOME
 
 import onboarding_webui as webui  # noqa: E402
 import profile_store  # noqa: E402

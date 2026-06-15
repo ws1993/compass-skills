@@ -7,7 +7,32 @@
 
 COMPASS helps AI agents understand the user, see the full task landscape, and avoid goal drift. It combines a local user profile, a repo-local task graph, and an alignment router into a reusable skills system for long-running AI work.
 
-![task-forest demo](assets/task-forest-demo.gif)
+## Understand It In 30 Seconds
+
+**Use case 1: before a task starts, avoid doing the wrong thing.**
+When a request is ambiguous, costly, or risky, use `$task-clarifier` to decide whether to proceed, research first, ask, confirm risk, offer workflow choices, or stop. Its value is not asking more questions; it asks only questions that change the execution path.
+
+**Use case 2: during and after work, turn progress into a task map.**
+Use `$task-forest` to convert session goals, progress, deviations, dependencies, todos, and decisions into a proposal. After approval, it exports a tree view, DAG view, task detail cards, and a recommended queue so the next agent or next session knows why the task exists, what changed, and what to do next.
+
+**Use case 3: over long-term collaboration, personalize without overreaching.**
+Use `$user-profile-keeper` to store an auditable, correctable, retractable local collaboration profile. It does not save secrets or upload data; `task-clarifier` only reads a low-risk summary to reduce unnecessary clarification.
+
+Tree view and session update flow:
+
+![task-forest tree demo](assets/task-forest-demo.gif)
+
+DAG relationship view:
+
+![task-forest DAG view](assets/task-forest-dag-view.png)
+
+Task details, purpose, requirements, evidence, and scheduling:
+
+![task-forest detail view](assets/task-forest-detail-view.png)
+
+User profile and alignment flow:
+
+![profile and clarifier flow](assets/profile-clarifier-flow.png)
 
 ## Why COMPASS
 
@@ -62,7 +87,7 @@ flowchart TD
 
 ![COMPASS system map](assets/compass-system-map.svg)
 
-## Installation And Compatibility
+## Installation And Agent Compatibility
 
 The three released skills use Python standard-library scripts and Markdown instructions. They do not depend on cloud services and do not upload user data.
 
@@ -72,7 +97,17 @@ The three released skills use Python standard-library scripts and Markdown instr
 - `user-profile-keeper` stores profile data under the local user home at `.compass-skills/user-profiles/v1` by default. Override with `COMPASS_USER_PROFILE_HOME`.
 - All writes are local files or local SQLite databases. There is no browser-cookie access, credential access, network upload, or remote write.
 
-Copy the three folders under `skills/` into your local skills directory, then invoke them in any session:
+COMPASS is not Codex-only. It is an agent-agnostic `SKILL.md` skills package: any agent that supports `SKILL.md`, YAML frontmatter, Markdown instructions, and optional `scripts/` / `references/` can use it natively or near-natively. Agents without native skills support can use the root [AGENTS.md](AGENTS.md) as a lightweight adapter.
+
+| Agent / Environment | Recommended setup |
+| --- | --- |
+| Codex | Copy the three folders under `skills/` into a Codex-discoverable skills directory, or use them as repo-local skills. |
+| Claude Code | Copy the three folders under `skills/` into the Claude Code custom skills directory, or place them under a project skills root. |
+| OpenClaw | Place them under workspace `skills/`, `.agents/skills`, or a personal/managed skills directory, following OpenClaw precedence. |
+| OpenCode | Keep this repo's `skills/` and [AGENTS.md](AGENTS.md); let the agent discover and read the matching `SKILL.md` through the AGENTS rules. |
+| Other agents | If the agent can read local files and run local scripts, load the package through [AGENTS.md](AGENTS.md): read `SKILL.md` first, then use `references/` and `scripts/` as needed. |
+
+In general, copy the three folders under `skills/` into your target agent's local skills directory, then invoke them in any session:
 
 ```text
 $user-profile-keeper
@@ -173,4 +208,3 @@ Coming next:
 - [ ] Run Python compile checks and the task-forest clean-room export validation.
 - [ ] Scan for private paths, tokens, credentials, internal logs, and runtime residue.
 - [ ] Test the three prompts in a fresh workspace.
-

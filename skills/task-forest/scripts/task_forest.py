@@ -62,6 +62,10 @@ DONE_STATUSES = {"done", "deprecated", "archived"}
 DIFFICULTIES = {"low", "medium", "high", "very_high", "unknown"}
 
 
+def default_actor() -> str:
+    return (os.environ.get("COMPASS_AGENT_NAME") or os.environ.get("AGENT_NAME") or "agent").strip() or "agent"
+
+
 def now_iso() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
@@ -2992,7 +2996,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--depends-on", action="append", default=[])
     p.add_argument("--contributes-to", action="append", default=[])
     p.add_argument("--session-id")
-    p.add_argument("--actor", default="codex")
+    p.add_argument("--actor", default=default_actor())
     p.add_argument("--fields-json")
     p.add_argument("--fields-file")
     p.set_defaults(func=cmd_add_node)
@@ -3022,7 +3026,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--append-tag", action="append", default=[])
     p.add_argument("--append-hint", action="append", default=[])
     p.add_argument("--append-evidence", action="append", default=[])
-    p.add_argument("--actor", default="codex")
+    p.add_argument("--actor", default=default_actor())
     p.add_argument("--fields-json")
     p.add_argument("--fields-file")
     p.set_defaults(func=cmd_update_node)
@@ -3035,7 +3039,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--reason")
     p.add_argument("--confidence", type=float, default=0.6)
     p.add_argument("--session-id")
-    p.add_argument("--actor", default="codex")
+    p.add_argument("--actor", default=default_actor())
     p.set_defaults(func=cmd_add_edge)
 
     p = sub.add_parser("remove-edge", help="删除任务关系边")
@@ -3044,7 +3048,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--from", dest="from_id")
     p.add_argument("--to", dest="to_id")
     p.add_argument("--type", choices=sorted(EDGE_TYPES))
-    p.add_argument("--actor", default="codex")
+    p.add_argument("--actor", default=default_actor())
     p.set_defaults(func=cmd_remove_edge)
 
     p = sub.add_parser("list", help="列出节点")
@@ -3091,7 +3095,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--yes", action="store_true")
     p.add_argument("--allow-stale", action="store_true", help="允许应用基于旧 graph hash 的 proposal；仅在人工确认无冲突后使用")
     p.add_argument("--allow-reapply", action="store_true", help="允许重复应用已标记 applied 的 proposal")
-    p.add_argument("--actor", default="codex")
+    p.add_argument("--actor", default=default_actor())
     p.set_defaults(func=cmd_proposal_apply)
 
     return parser

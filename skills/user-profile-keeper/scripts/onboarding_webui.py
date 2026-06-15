@@ -336,7 +336,7 @@ def page(user_id: str, result: dict | None = None) -> str:
         result_html = f"""
         <section class="result">
           <h2>已生成待确认画像更新</h2>
-          <p>这些内容还没有自动写入 active profile。请回到 Codex 查看 proposal，并决定是否应用。</p>
+          <p>这些内容还没有自动写入 active profile。请回到你的 agent 会话查看 proposal，并决定是否应用。</p>
           {redaction_note}
           <pre>{html.escape(json.dumps(result, ensure_ascii=False, indent=2))}</pre>
         </section>
