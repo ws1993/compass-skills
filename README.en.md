@@ -12,21 +12,29 @@ COMPASS helps AI agents understand the user, see the full task landscape, and av
 **Use case 1: before a task starts, avoid doing the wrong thing.**
 When a request is ambiguous, costly, or risky, use `$task-clarifier` to turn fuzzy intent into a shared executable requirement: the user understands what they want, the agent understands it the same way, and the user can verify that understanding. It does not ask more questions; it asks fewer, better questions that change the path.
 
-**Use case 2: during and after work, turn progress into a task map.**
-Use `$task-forest` to convert session goals, progress, deviations, dependencies, todos, and decisions into a proposal. After approval, it exports a tree view, DAG view, task detail cards, and a recommended queue so the next agent or next session knows why the task exists, what changed, and what to do next.
+This skill guarantees 3 things:
+
+1. Help the user fully understand their own requirement.
+2. Help the AI fully understand the user's requirement.
+3. Let the user see that the AI has fully understood the requirement.
+
+**Use case 2: during and after work, automatically build a task tree / task forest.**
+Use `$task-forest` to automatically convert current-session goals, progress, deviations, dependencies, todos, and decisions into a proposal. After approval, it exports a tree view, DAG view, task detail cards, and a recommended queue so the next agent or next session knows why the task exists, what changed, and what to do next.
 
 **Use case 3: over long-term collaboration, personalize without overreaching.**
-Use `$user-profile-keeper` to store an auditable, correctable, retractable local collaboration profile. It does not save secrets or upload data; `task-clarifier` can read a low-risk summary to ask questions in a way that fits the user. Without a profile, `task-clarifier` still works normally and provides strong alignment.
+Use `$user-profile-keeper` to store an auditable, correctable, retractable local collaboration profile. It does not save secrets or upload data; `$task-clarifier` can read a low-risk summary to ask questions in a way that fits the user. Without a profile, `$task-clarifier` still works normally and provides strong alignment.
 
-Tree view and session update flow:
+Task relationship tree view and session update flow generated from the user's sessions:
 
 ![task-forest tree demo](assets/task-forest-demo.gif)
+
+This GIF shows the HTML export generated after multiple sessions ran the current `$task-forest` skill, making the repo's task structure gradually more complete.
 
 Live DAG relationship view:
 
 ![task-forest live DAG view](assets/task-forest-live-dag.png)
 
-Live task details, purpose, requirements, evidence, and scheduling:
+Automatically generated task details, purpose, requirements, evidence, and scheduling suggestions:
 
 ![task-forest live detail view](assets/task-forest-live-detail.png)
 
@@ -50,14 +58,14 @@ If you are new to `SKILL.md` skills, start with the Chinese static tutorial: [Ho
 
 | Layer | Skill | Purpose |
 | --- | --- | --- |
-| **Know the user** | [`user-profile-keeper`](skills/user-profile-keeper/) | Maintains a local, auditable, correctable user profile for communication preferences, risk boundaries, and collaboration style. |
-| **Know the work** | [`task-forest`](skills/task-forest/) | Maintains a repo-local task forest / DAG with goals, subtasks, dependencies, progress, deviations, todos, and history snapshots. |
-| **Know the direction** | [`task-clarifier`](skills/task-clarifier/) | Turns fuzzy intent into a shared executable requirement that the user understands, the agent understands, and the user can verify. |
+| **Know the user** | [`$user-profile-keeper`](skills/user-profile-keeper/) | Maintains a local, auditable, correctable user profile for communication preferences, risk boundaries, and collaboration style. |
+| **Know the work** | [`$task-forest`](skills/task-forest/) | Maintains a repo-local task forest / DAG with goals, subtasks, dependencies, progress, deviations, todos, and history snapshots. |
+| **Know the direction** | [`$task-clarifier`](skills/task-clarifier/) | Turns fuzzy intent into a shared executable requirement that the user understands, the agent understands, and the user can verify. |
 
 ```text
-User Profile Keeper answers: who is the user and how should we collaborate?
-Task Forest answers: where does this task fit and what changed?
-Task Clarifier answers: should we do this, and how do we avoid drifting?
+$user-profile-keeper answers: who is the user and how should we collaborate?
+$task-forest answers: where does this task fit and what changed?
+$task-clarifier answers: should we do this, and how do we avoid drifting?
 ```
 
 ## Ecosystem DAG
@@ -70,8 +78,8 @@ The three released skills use Python standard-library scripts and Markdown instr
 
 - macOS / Linux examples use `python3`.
 - Windows users can use `py -3` or `python`.
-- `task-forest` stores task data in the current workspace at `.agent-workbench/task-forest/`.
-- `user-profile-keeper` stores profile data under the local user home at `.compass-skills/user-profiles/v1` by default. Override with `COMPASS_USER_PROFILE_HOME`.
+- `$task-forest` stores task data in the current workspace at `.agent-workbench/task-forest/`.
+- `$user-profile-keeper` stores profile data under the local user home at `.compass-skills/user-profiles/v1` by default. Override with `COMPASS_USER_PROFILE_HOME`.
 - All writes are local files or local SQLite databases. There is no browser-cookie access, credential access, network upload, or remote write.
 
 COMPASS is not Codex-only. It is an agent-agnostic `SKILL.md` skills package: any agent that supports `SKILL.md`, YAML frontmatter, Markdown instructions, and optional `scripts/` / `references/` can use it natively or near-natively. Agents without native skills support can use the root [AGENTS.md](AGENTS.md) as a lightweight adapter.
@@ -100,7 +108,7 @@ Requirements:
 2. Confirm that the skills do not upload user data, read credentials / tokens / cookies, write remotely, change global configuration, or run dangerous commands.
 3. Identify the local skills directory and loading rules for the current agent / harness. If this cannot be identified reliably, provide an install plan and do not write files.
 4. Copy only the released skill folders under `skills/`. Do not copy `.git`, runtime caches, user profiles, task graphs, raw screenshots, or local environment files.
-5. After installation, run available local validation, such as Python compile checks and the task-forest export regression. If a check cannot run, explain why and state the remaining risk.
+5. After installation, run available local validation, such as Python compile checks and the `$task-forest` export regression. If a check cannot run, explain why and state the remaining risk.
 6. Report the install location, installed skills, safety review result, validation result, and how to invoke the skills in a session.
 ```
 
@@ -114,11 +122,11 @@ $task-clarifier
 
 ## Released Skills
 
-### user-profile-keeper: Local User Profile
+### $user-profile-keeper: Local User Profile
 
-Maintains a local user profile that is auditable, correctable, and retractable. It is for collaboration preferences, clarification style, risk boundaries, capability boundaries, and recurring omissions. It does not save secrets or upload data. `task-clarifier` may read only the low-risk `clarification_summary` to ask better questions; it also works well without a profile.
+`$user-profile-keeper` maintains a local user profile that is auditable, correctable, and retractable. It is for collaboration preferences, clarification style, risk boundaries, capability boundaries, and recurring omissions. It does not save secrets or upload data. `$task-clarifier` may read only the low-risk `clarification_summary` to ask better questions; it also works well without a profile.
 
-**Important:** `user-profile-keeper` stores data locally in plaintext. It is not an encrypted vault. These skills are designed not to upload, exfiltrate, or read credentials, but local files may still be readable by other processes, backups, or users with access to the same machine. Use it only after understanding this risk, and do not store secrets, tokens, passwords, private keys, verification codes, or highly sensitive information.
+**Important:** `$user-profile-keeper` stores data locally in plaintext. It is not an encrypted vault. These skills are designed not to upload, exfiltrate, or read credentials, but local files may still be readable by other processes, backups, or users with access to the same machine. Use it only after understanding this risk, and do not store secrets, tokens, passwords, private keys, verification codes, or highly sensitive information.
 
 **Initial profile prompt**
 
@@ -143,29 +151,29 @@ Auto-apply only explicit, low-risk, non-conflicting facts. Put inferred, private
 Do not save secrets, tokens, passwords, private keys, verification codes, or browser-session information.
 ```
 
-### task-forest: Task Map And Progress Control
+### $task-forest: Task Forest And Progress Control
 
-Maintains a repo-local task forest / DAG. It tracks goals, subtasks, dependencies, progress, deviations, todos, decisions, and session history. Its HTML export gives users an offline tree view, DAG view, history view, and review queue.
+`$task-forest` maintains a repo-local task forest / DAG. It tracks goals, subtasks, dependencies, progress, deviations, todos, decisions, and session history. Its HTML export gives users an offline tree view, DAG view, history view, and review queue.
 
 **Build or update task forest prompt**
 
 ```text
 Use $task-forest to analyze the current session and maintain the task forest for this workspace.
 
-Goal: turn durable goals, tasks, progress, deviations, risks, decisions, and follow-ups from this session into a task-forest proposal.
+Goal: turn durable goals, tasks, progress, deviations, risks, decisions, and follow-ups from this session into a `$task-forest` proposal.
 Requirements:
-1. Read the current list and todo first; initialize task-forest if missing.
+1. Read the current `$task-forest` list and todo first; initialize `$task-forest` if missing.
 2. Identify which long-term goal this session served. If no relation is clear, do not force an edge; ask me or create a question/risk node.
 3. If a task cannot serve the real user goal, record a deviation or propose a better alternative.
 4. Save a proposal and show me the planned changes before applying.
 5. After approval, apply, validate, export, and report the HTML path.
 ```
 
-### task-clarifier: Alignment And Risk Gate
+### $task-clarifier: Alignment And Risk Gate
 
-Turns fuzzy intent into a shared executable requirement: the user understands what they want, the agent understands it the same way, and the user can verify that understanding. It routes ambiguous, costly, risky, or evidence-sensitive tasks by asking only decision-changing questions; otherwise it researches first, proceeds with safe defaults, confirms risk, offers workflow choices, or blocks.
+`$task-clarifier` turns fuzzy intent into a shared executable requirement: the user understands what they want, the agent understands it the same way, and the user can verify that understanding. It routes ambiguous, costly, risky, or evidence-sensitive tasks by asking only decision-changing questions; otherwise it researches first, proceeds with safe defaults, confirms risk, offers workflow choices, or blocks.
 
-If `user-profile-keeper` is installed, `task-clarifier` can use a low-risk profile summary to tailor its questions. If no profile exists, it still works normally from the current context, files, and evidence.
+If `$user-profile-keeper` is installed, `$task-clarifier` can use a low-risk profile summary to tailor its questions. If no profile exists, it still works normally from the current context, files, and evidence.
 
 **General prompt**
 
@@ -178,15 +186,23 @@ Constraints: do not ask what can be inferred from files, context, or reliable so
 Output: decide whether to proceed, research-first, ask, confirm, offer-method-choice, or block, and explain why.
 ```
 
+## What It Can Do
+
+- At the end of a new session, automatically place progress, deviations, decisions, and todos into the global task graph. Users can wire this into their own hooks.
+- When a new task has no clear parent or contribution relationship, meaning the session's purpose is unclear, ask the user to recheck the goal instead of forcing an edge.
+- When a task becomes complex, risky, or ambiguous, enter the alignment gate first to reduce rework and privacy risk.
+- Let the user profile influence how questions are asked, without replacing current context or treating historical preferences as absolute truth.
+- Provide structured foundations for daily reports, weekly reports, task ordering, habit systems, multi-agent control, and self-evolving skill workflows.
+
 ## Security And Privacy
 
 COMPASS defaults:
 
 - No network upload for profile or task data.
-- `user-profile-keeper` uses local plaintext storage by default. It provides local-first, auditable, deletable storage; it does not provide encryption.
+- `$user-profile-keeper` uses local plaintext storage by default. It provides local-first, auditable, deletable storage; it does not provide encryption, so users should decide whether to install and use it after understanding that risk.
 - No browser-cookie, token, credential, private-key, or session reading.
 - Full profile data is not exposed to ordinary skills; only low-risk `clarification_summary` may be read.
-- `task-forest` stores full task content in repo-local files and keeps any global registry lightweight.
+- `$task-forest` stores full task content in repo-local files and keeps any global registry lightweight.
 - Destructive actions, publishing, remote writes, credential use, and global configuration changes require explicit confirmation.
 - HTML exports are static offline files and do not modify the task graph.
 
@@ -198,21 +214,25 @@ See [SECURITY.md](SECURITY.md).
 
 Coming next:
 
-- `run-history-skill-builder`: build reusable skills from real task histories.
-- `run-history-skill-upgrader`: upgrade existing skills from failures, feedback, and validation evidence.
-- `session-handoff-prompt`: generate restart prompts for long sessions using task-forest as structured context.
+- `$run-history-skill-builder`: build reusable skills from real task histories.
+- `$run-history-skill-upgrader`: upgrade existing skills from failures, feedback, and validation evidence.
+- `$session-handoff-prompt`: generate restart prompts for long sessions using `$task-forest` as structured context.
 - Local Agent Control Room: summarize local agent states, risk, waiting-human items, and review queues.
-- Gap Router: recommend low-switching-cost tasks using wait time, energy, and task-forest todos.
+- Gap Router: recommend low-switching-cost tasks using wait time, energy, and `$task-forest` todos.
 - Daily / weekly reports, project retrospectives, task ordering, deadline planning, and healthier work-rhythm systems.
+
+## License
+
+This project is released under the MIT License. See [LICENSE](LICENSE).
 
 ## Pre-Release Checklist
 
-- [ ] Choose and add an open-source license.
+- [x] Choose and add an open-source license.
 - [ ] Confirm installation paths for the target distribution channel.
-- [ ] Run Python compile checks and the task-forest clean-room export validation.
+- [ ] Run Python compile checks and the `$task-forest` clean-room export validation.
 - [ ] Scan for private paths, tokens, credentials, internal logs, and runtime residue.
 - [ ] Test the three prompts in a fresh workspace.
 
 ## Community Discussion
 
-- Linux.do discussion placeholder: [https://linux.do/](https://linux.do/)
+- This repo has been shared as open source on [Linux.do](https://linux.do/).
