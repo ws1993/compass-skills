@@ -1,6 +1,6 @@
 ---
 name: task-forest
-description: 维护当前任务目录的 repo-local 任务森林或任务 DAG。Use when the user asks to initialize, update, close a session, summarize evolving project tasks, decide whether a new request is a global task or subtask, track task progress/history/deviations/todos, export a task graph HTML, or provide task data for gap-router/local-agent-control-room. Do not use for executing the tasks themselves.
+description: Maintains a repo-local task forest or task DAG for the current workspace. Use when the user asks to initialize, update, close a session, summarize evolving project tasks, decide whether a new request is a global task or subtask, track task progress/history/deviations/todos, export a task graph HTML, or provide task data for gap-router/local-agent-control-room. Do not use for executing the tasks themselves.
 ---
 
 # Task Forest

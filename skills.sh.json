@@ -1,0 +1,15 @@
+{
+  "$schema": "https://skills.sh/schemas/skills.sh.schema.json",
+  "notGrouped": "bottom",
+  "groupings": [
+    {
+      "title": "Core Skills",
+      "description": "Local-first skills for task alignment, task memory, and user-aware agent collaboration.",
+      "skills": [
+        "task-clarifier",
+        "task-forest",
+        "user-profile-keeper"
+      ]
+    }
+  ]
+}

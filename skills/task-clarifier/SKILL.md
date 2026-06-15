@@ -1,6 +1,6 @@
 ---
 name: task-clarifier
-description: 通用任务澄清与需求对齐路由。用于在模糊、高成本、高风险、证据敏感、用户意图敏感、外部副作用、隐私安全、coding/debugging、科研文献、实验 benchmark、论文写作、图表设计、安装发布、自动化、prompt/design/spec 等任务开始前，决定应该直接推进、先读代码/文件/资料、联网搜索、询问用户、确认风险、提供方法选择或阻塞。目标是用最小但足够的问题，把用户真实、具体、完整、可执行、可验证的需求对齐出来，并让用户知道 agent 的理解；不要用于简单、低风险、可逆且上下文已经足够的请求。
+description: Requirement clarification and alignment router for Codex, Claude Code, and other agents. Use before ambiguous, high-cost, high-risk, evidence-sensitive, user-intent-sensitive, privacy/security-sensitive, externally visible, coding/debugging, research, benchmark, paper-writing, figure/design, install/release, automation, prompt/design/spec tasks to decide whether to proceed, read files, search, ask, confirm risk, offer method choices, or block. Ensures the user understands the requirement, the agent understands it, and the user can verify that understanding. Do not use for simple, low-risk, reversible tasks with enough context.
 ---
 
 # Task Clarifier

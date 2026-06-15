@@ -1,6 +1,6 @@
 ---
 name: user-profile-keeper
-description: 本地用户画像维护 skill。用于用户明确调用本 skill，要求创建、初始化、更新、查询、纠错、删除、导出或审计自己的本地持久化用户画像；也用于从当前 session 上下文中提取沟通偏好、需求表达习惯、能力边界、常见遗漏、风险偏好和典型事件，并以可审计、可确认、可撤回的方式写入本地画像。不要自动调用；不要上传画像；不要替代 task-clarifier 的正常澄清流程。
+description: Local user-profile maintenance skill for Codex, Claude Code, and other agents. Use only when the user explicitly invokes this skill or asks to create, initialize, update, query, correct, delete, export, or audit a local persistent user profile. Also use to extract durable collaboration preferences, requirement-expression habits, capability boundaries, recurring omissions, risk preferences, privacy boundaries, and typical events from the current session into auditable, confirmable, retractable local profile data. Do not auto-invoke, upload profile data, or replace task-clarifier's normal clarification flow.
 ---
 
 # User Profile Keeper
