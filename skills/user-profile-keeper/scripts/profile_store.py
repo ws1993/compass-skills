@@ -24,6 +24,50 @@ BASE_DIR = Path(
 VALID_SOURCE_TYPES = {"self_report", "observed", "inferred", "correction"}
 VALID_SENSITIVITY = {"low", "private", "sensitive", "intimate", "secret"}
 VALID_STATUS = {"active", "pending", "superseded", "retracted", "conflicted"}
+SAFE_AUTO_APPLY_CATEGORIES = {
+    "communication_preference",
+    "clarification_style",
+    "decision_style",
+    "domain_familiarity",
+    "capability_boundary",
+    "common_omission",
+    "risk_boundary",
+    "privacy_boundary",
+    "workflow_preference",
+    "anti_bubble_rule",
+    "correction",
+}
+OPERATIONAL_EVIDENCE_MARKERS = {
+    "agents.md",
+    "agents rule",
+    "agents file",
+    "system instruction",
+    "system instructions",
+    "developer instruction",
+    "developer instructions",
+    "repository instruction",
+    "repository instructions",
+    "repository constraint",
+    "repository constraints",
+    "repo instruction",
+    "repo instructions",
+    "repo constraint",
+    "repo constraints",
+    "skill instruction",
+    "skill instructions",
+    "skill operating",
+    "skill rule",
+    "skill rules",
+    "tool instruction",
+    "tool instructions",
+    "current task",
+    "current-task",
+    "task constraint",
+    "task constraints",
+    "task-local",
+    "operational instruction",
+    "operational instructions",
+}
 SUMMARY_CATEGORIES = {
     "communication_preference",
     "clarification_style",
@@ -349,12 +393,32 @@ def conflicts_for(conn: sqlite3.Connection, user_id: str, candidate: dict[str, A
     return [row["assertion_id"] for row in rows if row["value_json"] != wanted]
 
 
+def evidence_text(candidate: dict[str, Any]) -> str:
+    evidence = candidate.get("evidence") or {}
+    parts = [
+        candidate.get("category"),
+        candidate.get("claim"),
+        evidence.get("summary"),
+        evidence.get("context"),
+        evidence.get("source_ref"),
+        evidence.get("raw_excerpt"),
+    ]
+    return " ".join(str(part) for part in parts if part).lower()
+
+
+def is_operational_evidence(candidate: dict[str, Any]) -> bool:
+    text = evidence_text(candidate)
+    return any(marker in text for marker in OPERATIONAL_EVIDENCE_MARKERS)
+
+
 def is_safe_auto_apply(candidate: dict[str, Any], conflicts: list[str]) -> bool:
     return (
         candidate["sensitivity"] == "low"
         and candidate["source_type"] in {"self_report", "observed", "correction"}
         and candidate["confidence"] >= 0.75
         and not conflicts
+        and candidate["category"].lower() in SAFE_AUTO_APPLY_CATEGORIES
+        and not is_operational_evidence(candidate)
     )
 
 

@@ -1,76 +1,71 @@
-# 目标对齐与候选任务生成
+# Goal Alignment And Candidate Task Design
 
-## 目录
+## Contents
 
-- 与 task-clarifier 的边界
-- 目标对齐流程
-- 任务是否能达成目的
-- 候选方案格式
-- 写入 task-forest
-- 反例和降级策略
+- Boundary With task-clarifier
+- Goal Alignment Workflow
+- Task Fit Assessment
+- Candidate Plan Format
+- Writing To task-forest
+- Anti-Patterns And Fallbacks
 
-## 与 task-clarifier 的边界
+## Boundary With task-clarifier
 
-`task-clarifier` 负责判断：
+`task-clarifier` decides:
 
-- 是否需要问用户；
-- 该问一个问题、批量问题、方法选择还是 intent interview；
-- 是否需要先研究、确认或阻塞。
+- whether to ask the user;
+- whether to ask one question, batch questions, offer method choices, or run an intent interview;
+- whether to research, confirm risk, or block before execution.
 
-`task-forest` 负责判断：
+`task-forest` decides:
 
-- 当前任务在全局任务图中的意义；
-- 它服务哪个 global 目的；
-- 它是否真的能达成用户预想目的；
-- 若不能，应该拆出哪些更有效的候选任务；
-- 多个候选任务方案各自的可行性、有效性、准确性、完整性、稳定性和复杂度。
+- what the current work means inside the global task graph;
+- which global goal it serves;
+- whether the proposed task can achieve the user's purpose;
+- which candidate task plan would serve the purpose more effectively;
+- how candidate plans compare on feasibility, effectiveness, accuracy, completeness, stability, robustness, and complexity.
 
-不要把 task-clarifier 改成项目管理工具。task-forest 调用它的澄清方法，但专门的任务图、候选方案和目的-任务对齐逻辑保留在 task-forest。
+Keep task-clarifier focused on need alignment. Keep task-forest focused on graph structure, candidate task plans, and purpose-to-task fit.
 
-## 目标对齐流程
+## Goal Alignment Workflow
 
-当用户提出新任务、修改任务、要求生成任务，或当前 session 的目的不清晰时：
+When the user proposes a new task, changes a task, asks to generate tasks, or the current session purpose is unclear:
 
-1. 先读取当前任务图：
+1. Read the current graph:
 
 ```bash
 python3 scripts/task_forest.py list --json
 python3 scripts/task_forest.py todo --json
 ```
 
-2. 用 task-clarifier 的规则判断是否需要问用户：
+2. Apply `$task-clarifier` rules for any decision about asking the user, researching first, offering method choices, confirming risk, or blocking. This file must not define its own clarification route.
 
-- 如果真实目的、受众、成功标准、风险边界不清楚，做 intent interview。
-- 如果可从当前图、用户消息或本地文件推断，先推断并标注置信度。
-- 如果多个工作流都合理，给出 2-3 个方法选择。
-- 如果更新会产生高成本或长期影响，先确认。
-
-3. 把用户目的拆成结构化字段：
+3. Convert the confirmed purpose into structured fields:
 
 ```text
-user_goal: 用户真正想达到的结果
-why_now: 为什么现在要做
-success_metrics: 如何判断目的达成
-constraints: 必须满足的边界
-non_goals: 明确不做什么
-risk_tolerance: 对复杂度、准确性、速度、稳定性的偏好
+user_goal: the result the user wants
+why_now: why this matters now
+success_metrics: how success will be recognized
+constraints: hard boundaries
+non_goals: explicit exclusions
+risk_tolerance: preference across complexity, accuracy, speed, and stability
 ```
 
-4. 与任务森林对齐：
+4. Align the purpose with the task forest:
 
-- 能挂到已有 global task：用 `child_of` 或更新旧节点。
-- 同时服务多个目标：选一个主父节点，再用 `contributes_to`。
-- 目的不属于任何现有 global task：新增 `global_task`。
-- 现有任务不能达成目的：不要硬挂；生成替代任务方案。
+- If it fits an existing global task, use `child_of` or update the existing node.
+- If it serves multiple goals, choose one primary parent and connect the rest with `contributes_to`.
+- If it does not belong under any existing global task, create a `global_task`.
+- If the existing task cannot achieve the purpose, create a better candidate plan.
 
-## 任务是否能达成目的
+## Task Fit Assessment
 
-评估每个候选任务时至少回答：
+Assess each candidate task with at least:
 
 ```text
 fit: aligned | partial | weak | misaligned | unknown
-why_this_task: 为什么它能服务用户目的
-why_not_enough: 它无法覆盖哪些需求或风险
+why_this_task: how it serves the user's purpose
+why_not_enough: uncovered needs or risks
 feasibility: low | medium | high
 effectiveness: low | medium | high
 accuracy: low | medium | high
@@ -79,103 +74,103 @@ stability: low | medium | high
 robustness: low | medium | high
 complexity: low | medium | high
 confidence: 0.0-1.0
-validation_plan: 如何验证它确实达成目的
+validation_plan: how to verify the task achieved the purpose
 ```
 
-如果 `fit` 是 `weak`、`misaligned` 或 `unknown`，不要把任务直接标为 ready。应提出澄清问题、记录风险，或生成更合适的候选方案。
+For `weak`, `misaligned`, or `unknown` fit, ask a clarifying question, record a risk, or propose a stronger candidate. Do not mark the task as `ready`.
 
-## 候选方案格式
+## Candidate Plan Format
 
-当用户需要选择任务方案时，给出 2-3 个方案，避免无差异堆砌。
+When the user needs to choose among task plans, offer 2-3 meaningfully different options.
 
 ```text
-我把你的真实目标理解为：...
+I understand your real goal as: ...
 
-方案 A：低复杂度快速版
-- 任务：
-- 为什么符合目标：
-- 能覆盖：
-- 覆盖不了：
-- 可行性：
-- 有效性：
-- 准确性：
-- 完整性：
-- 稳定性/鲁棒性：
-- 代价：
-- 验证方式：
+Option A: Low-complexity quick version
+- Task:
+- Why it fits:
+- Coverage:
+- Gaps:
+- Feasibility:
+- Effectiveness:
+- Accuracy:
+- Completeness:
+- Stability/robustness:
+- Cost:
+- Validation:
 
-方案 B：平衡版（推荐）
+Option B: Balanced version (recommended)
 ...
 
-方案 C：高完整度版
+Option C: High-completeness version
 ...
 
-我的推荐：B，因为 ...
-需要你选择的是：速度优先、平衡优先，还是完整度优先。
+My recommendation: B, because ...
+The decision needed from you is: speed first, balanced, or completeness first.
 ```
 
-方案必须真实可执行。不要为了凑数量生成明显低质量方案。
+Each option must be executable. Avoid filler options.
 
-## 写入 task-forest
+## Writing To task-forest
 
-确认后，生成 proposal。节点字段应尽量包含：
+After confirmation, create a proposal. Important node fields should include:
 
 ```json
 {
-  "purpose": "用户真实目标",
-  "desired_outcomes": ["期望结果"],
-  "success_metrics": ["判断目标达成的指标"],
-  "non_goals": ["不做什么"],
-  "assumptions": ["关键假设"],
+  "purpose": "the user's real goal",
+  "desired_outcomes": ["expected result"],
+  "success_metrics": ["signals that the goal is achieved"],
+  "non_goals": ["explicit exclusions"],
+  "assumptions": ["key assumptions"],
   "alignment": {
-    "user_goal": "用户真实目标",
+    "user_goal": "the user's real goal",
     "fit": "aligned",
     "fit_confidence": 0.85,
-    "why_this_task": "为什么这个任务能达成目的",
-    "why_not_enough": "仍然不足的部分",
-    "validation_plan": ["验证步骤"]
+    "why_this_task": "why this task serves the goal",
+    "why_not_enough": "remaining gaps",
+    "validation_plan": ["verification steps"]
   }
 }
 ```
 
-需要保留一次对齐审计时，在 proposal 中加入：
+To preserve an alignment audit, add this to the proposal:
 
 ```json
 {
   "action": "record_alignment",
   "alignment": {
     "related_task_ids": ["TF-0001"],
-    "user_goal": "用户真实目标",
-    "candidate_summary": "本轮生成的候选任务方案摘要",
+    "user_goal": "the user's real goal",
+    "candidate_summary": "summary of candidate task plans",
     "selected_option": "B",
     "rejected_options": ["A", "C"],
-    "reason": "选择 B 的理由",
+    "reason": "why B was selected",
     "node_alignment": {
-      "user_goal": "用户真实目标",
+      "user_goal": "the user's real goal",
       "fit": "aligned",
       "fit_confidence": 0.85,
-      "why_this_task": "为什么符合目标",
-      "why_not_enough": "尚未覆盖的边界",
-      "validation_plan": ["如何验证"]
+      "why_this_task": "why it fits",
+      "why_not_enough": "remaining boundary",
+      "validation_plan": ["how to verify"]
     },
     "confidence": 0.85
   }
 }
 ```
 
-## 反例和降级策略
+## Anti-Patterns And Fallbacks
 
-不要这样做：
+Avoid:
 
-- 用户目的不清楚时直接创建任务。
-- 把“用户说要做的动作”当成“用户真正要达成的目的”。
-- 为了给用户选择而生成不可行或明显劣质方案。
-- 只解释任务本身，不解释它如何服务 global 目的。
-- 忽略任务可能无法达成目的的风险。
+- creating a task while the user's purpose is unclear;
+- treating the requested action as the user's real outcome without checking fit;
+- generating weak options to reach an option count;
+- describing the task without describing how it serves the global purpose;
+- ignoring the risk that a task may fail to achieve the purpose.
 
-降级策略：
+Fallbacks:
 
-- 目的不清楚：问一个 task-clarifier 风格的问题。
-- 方案都不可靠：明确说当前信息不足，只保存 question 节点或 proposal。
-- 任务与目的冲突：记录 `record_deviation` 或新增 `risk` 节点。
-- 用户要快速推进：给一个推荐方案和两个备选摘要，并标注假设。
+- Unclear purpose: ask one `$task-clarifier` style question.
+- Unreliable plans: say the information is insufficient and save a `question` node or proposal.
+- Task-purpose conflict: record `record_deviation` or add a `risk` node.
+- User wants quick progress: give one recommended plan and two brief alternatives with assumptions.

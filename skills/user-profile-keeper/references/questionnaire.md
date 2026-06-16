@@ -1,53 +1,53 @@
 # Onboarding Questionnaire
 
-初始化问卷只用于加速了解用户。用户可以跳过，也可以对任何问题选择“不回答”。
+The onboarding questionnaire accelerates user understanding. The user may skip it or leave any question unanswered.
 
 ## WebUI Rules
 
-- 只监听 `127.0.0.1`。
-- 使用随机高位端口，或回退到冷门端口。
-- 不加载 CDN、图片统计、外部字体或 analytics。
-- 表单提交后只生成 proposal，不自动写入敏感 active profile。
-- 用户提供的年龄段、教育、专业、职业/角色、经验阶段、长期目标等背景信息默认作为 `private` proposal，不直接写入 active。
-- 用户可以勾选“保存前总是确认敏感内容”。
-- 所有问题都允许不回答。
-- 所有选择题都必须包含一个互斥选项“用户自定义答案”；选项只是提示，不得限制用户答案。
-- 只有用户选择“用户自定义答案”时，才显示并启用文本框。
-- 用户选择“用户自定义答案”后，文本框内容就是该题答案；不要把“用户自定义答案”“自定义：”或其他 UI 标签写入 proposal。
-- 如果用户选择预设选项，即使请求中附带隐藏文本框内容，也应忽略隐藏文本框内容。
-- 提交前必须本地检查明显 credential 模式；疑似 secret 不写入 proposal 原文，只记录 redaction 事件和脱敏占位。
+- Listen only on `127.0.0.1`.
+- Use a random high port, with a quiet fallback port if needed.
+- Load no CDN assets, tracking images, external fonts, or analytics.
+- Form submission creates proposals. It does not write sensitive content directly to active profile data.
+- User-provided age range, education, field, role, experience stage, and long-term goals default to `private` proposals.
+- Let the user choose a setting that requires confirmation before saving sensitive content.
+- Every question must allow no answer.
+- Every multiple-choice question must include a mutually exclusive custom-answer option. Options are hints and must not limit the user's answer.
+- Show and enable the text box only after the user chooses the custom-answer option.
+- When the user chooses the custom-answer option, the text box content is the answer. Do not write UI labels such as "custom answer" into proposals.
+- When the user chooses a preset option, ignore hidden text box content even if it is submitted.
+- Before submission, check locally for obvious credential patterns. Suspected secrets must be redacted; store only a redaction event and placeholder.
 
 ## Answer Model
 
-问卷答案分为三类：
+Questionnaire answers have three states:
 
-- `blank`: 用户留空或选择“不回答”，不生成候选。
-- `selected`: 用户选择预设选项，预设选项文本就是该题答案。
-- `custom`: 用户选择“用户自定义答案”并填写文本框，文本框内容就是该题答案；不得因为不在预设选项中而丢弃、压缩成“其他”或改写为 agent 推断。
+- `blank`: the user left it empty or chose no answer; create no candidate.
+- `selected`: the user chose a preset option; the option text is the answer.
+- `custom`: the user chose the custom-answer option and filled the text box; the text box content is the answer.
 
-对选择题，最终摘要只保存最终答案文本。自定义内容如果包含敏感或高影响信息，按 `privacy-boundary.md` 和 `update-policy.md` 进入 pending 或 redaction。
+For multiple-choice questions, store only the final answer text in the summary. If custom content is sensitive or high-impact, route it through `privacy-boundary.md` and `update-policy.md` to pending or redaction.
 
-如果用户选择“用户自定义答案”但文本框为空，视为 `blank`，不生成候选。
+If the custom-answer option is selected and the text box is empty, treat it as `blank`.
 
 ## First-Run Use
 
-首次画像初始化时，WebUI 问卷是补齐上下文的主要入口。agent 不得因为当前 session 包含 AGENTS、skill 操作规则或隐私边界要求，就判断“上下文足够”并跳过问卷。
+The questionnaire is the main first-run path when no active profile exists. Recommend it before profile initialization.
 
-只有用户明确拒绝问卷，或当前 session 已提供覆盖至少 4 个问卷模块的长期自述，才可不启动问卷；跳过时必须说明覆盖模块和未覆盖模块。
+If the user asks for the questionnaire or WebUI, run it. If the user declines, continue with the current task and create proposals for any durable candidates. Current-session AGENTS rules, skill operating rules, privacy instructions, and task constraints do not initialize active profile data.
 
 ## Question Modules
 
-1. 基本协作信息：称呼、主要语言、时区、专业领域、常用任务类型。
-2. 背景信息：年龄段、最高学历或在读阶段、专业/主修/研究方向、职业/角色/当前身份、经验阶段、长期目标或希望长期获得帮助的方向。
-3. 沟通偏好：短答/长答、先结论/先证据、是否需要引用，以及“我应该如何指出问题、反驳假设或提醒风险”。
-4. 需求对齐偏好：快速澄清、证据优先、一问一答、best guess with assumptions。
-5. 能力边界：哪些领域表达清楚，哪些领域需要更多解释和例子。
-6. 常见遗漏：是否常漏验收标准、非目标、证据边界、受众、输出格式、风险边界。
-7. 风险确认：删除、覆盖、安装、发布、远程写入、credential、公开材料前的确认偏好。
-8. 隐私边界：哪些内容永不保存，哪些内容保存前必须确认。
-9. 敏感表达：可选填写哪些主题可能会下意识模糊表达；不要求具体细节。
-10. 反茧房：希望 agent 在哪些场景主动问一个跳出固定画像的问题。
+1. Basic collaboration: name preference, primary language, timezone if the user wants to share it, domain, common task types.
+2. Background: age range, education, field/major/research direction, role/current identity, experience stage, long-term goals, or long-term help direction.
+3. Communication preference: concise/detailed, conclusion-first/evidence-first, citation needs, and how the agent should point out issues, challenge assumptions, or warn about risk.
+4. Requirement alignment: quick clarification, evidence-first, one-question-at-a-time, or best guess with labeled assumptions.
+5. Capability boundary: areas the user can discuss directly and areas where more explanation or examples help.
+6. Common omissions: acceptance criteria, non-goals, evidence boundary, audience, output format, or risk boundary.
+7. Risk confirmation: delete, overwrite, install, publish, remote write, credential use, and public material confirmation preferences.
+8. Privacy boundary: content that must never be stored and content that requires confirmation before storage.
+9. Sensitive-expression preference: optional topics the user may phrase indirectly; never require details.
+10. Anti-bubble: scenarios where the agent should ask a profile-challenging question.
 
-不要使用“是否希望被挑战”这类容易误解的表述。应明确说明“指出问题、反驳假设或提醒风险”指的是任务、方案、证据和假设，不是评价用户本人。
+Use wording such as "point out issues, challenge assumptions, or warn about risk." Make clear that this targets tasks, plans, evidence, and assumptions.
 
-问卷答案应转换为 `proposal`，由用户确认后应用。
+Questionnaire answers become proposals. Apply them only after user confirmation.

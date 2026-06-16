@@ -1,105 +1,90 @@
 ---
 name: user-profile-keeper
-description: Local user-profile maintenance skill for Codex, Claude Code, and other agents. Use only when the user explicitly invokes this skill or asks to create, initialize, update, query, correct, delete, export, or audit a local persistent user profile. Also use to extract durable collaboration preferences, requirement-expression habits, capability boundaries, recurring omissions, risk preferences, privacy boundaries, and typical events from the current session into auditable, confirmable, retractable local profile data. Do not auto-invoke, upload profile data, or replace task-clarifier's normal clarification flow.
+description: Local user-profile maintenance skill for Codex, Claude Code, OpenClaw, OpenCode, and other agent harnesses. Use only when the user explicitly invokes this skill or asks to create, initialize, update, query, correct, delete, export, or audit a local persistent user profile. Also use to extract durable collaboration preferences, requirement-expression habits, capability boundaries, recurring omissions, risk preferences, privacy boundaries, and typical events from the current session into auditable, confirmable, retractable local profile data. Do not auto-invoke, upload profile data, or replace task-clarifier's normal clarification flow.
 ---
 
 # User Profile Keeper
 
-维护一个只保存在本机的用户画像。默认只有一个用户 `default`；只有用户明确说明“不是默认用户，是 XXX”时，才创建或切换到新的用户。
+## Language Policy
+
+Write skill instructions in English. When interacting with the user or generating profile summaries, proposals, exports, or questions, use the user's language. Default to Chinese when the user's language is unknown.
+
+## Role
+
+Maintain a local-only user profile. The default user is `default`. Create or switch to another user only when the user explicitly names another identity.
+
+## Portability
+
+This skill is agent-agnostic. Resolve paths from the directory that contains this `SKILL.md`. Use the available Python command on the host (`python3`, `python`, or `py -3`). The scripts are intended for macOS, Windows, and Linux with Python 3 and the standard library.
 
 ## Core Contract
 
-- 只在用户显式调用 `$user-profile-keeper` 或明确要求维护画像时使用。
-- 画像默认写入本机用户目录下的 `.compass-skills/user-profiles/v1`；可用 `COMPASS_USER_PROFILE_HOME` 指定其他本地目录。不联网、不上传、不读取浏览器 cookie、token 或 credential。
-- 画像是本地明文存储，不是加密保险箱。使用前必须让用户了解：本 skill 约束的是不上传、不窃取、可审计、可删除；本地文件仍可能被同机有权限的进程、用户或备份系统读取。
-- 每条画像都必须有来源类型、置信度、敏感级别、状态和证据事件；不要写入无法追溯的结论。
-- 低敏、显式、无冲突信息可以自动应用；推断性、敏感、高影响、冲突信息进入 pending proposal。
-- 画像范围可以覆盖沟通偏好、需求表达习惯、能力边界、风险确认、隐私边界、反茧房规则、典型事件，以及用户主动提供的年龄段、教育、专业、职业/角色、经验阶段和长期目标等背景信息。
-- 背景信息默认按 `private` 处理，除非用户明确要求降为低敏摘要；不得自动暴露给其他 skill。
-- 用户可以随时查看、纠错、撤回、删除、导出画像。
-- 完整画像只在本 skill 中读取。其他 skill 只能读取 `clarification_summary` 这类低敏摘要。
-- 首次初始化必须先做上下文充分性判断；不要把本次任务指令、AGENTS 约束或本 skill 的操作规则误当成完整用户画像。
-- 如果用户明确要求启动初始化问卷，必须启动 `scripts/onboarding_webui.py --user <id>`，不能用“当前上下文足够”替代问卷。
+- Use this skill only when the user explicitly invokes `$user-profile-keeper` or asks to maintain a profile.
+- Store profile data in the host user's local home directory under `.compass-skills/user-profiles/v1` by default. Use `COMPASS_USER_PROFILE_HOME` to set another local directory.
+- Do not upload profile data. Do not read browser cookies, tokens, passwords, private keys, verification codes, or credentials.
+- Treat the store as local plaintext. Before first initialization, tell the user that local files can be read by local processes, users, or backups with sufficient permission.
+- Every profile assertion must include source type, confidence, sensitivity, status, and evidence. Avoid untraceable conclusions.
+- Low-sensitivity explicit facts with no conflict may be sent through `--auto-apply-safe`; the script decides whether they become active. Inferred, private, sensitive, high-impact, or conflicting facts must become pending proposals.
+- Profile scope includes collaboration preferences, requirement-expression habits, capability boundaries, risk confirmation, privacy boundaries, anti-bubble rules, typical events, and user-provided background such as age range, education, field, role, experience stage, and long-term goals.
+- Treat background information as `private` by default unless the user explicitly asks for a low-sensitivity summary. Keep it out of cross-skill summaries by default.
+- Let the user view, correct, retract, delete, and export profile data at any time.
+- Read the full profile only inside this skill. Other skills may read only low-sensitivity views such as `clarification_summary`.
+- Current session instructions, AGENTS rules, repository constraints, and skill operating rules constrain the current task. They do not initialize a durable user profile by themselves.
+- If the user asks for the onboarding questionnaire or first-run WebUI, run `scripts/onboarding_webui.py --user <id>`.
 
 ## Context Adequacy Gate
 
-画像证据分三类：
+Use one gate:
 
-- `durable_profile_evidence`: 用户明确表达的长期或默认协作偏好、风险边界、隐私边界、能力边界、常见遗漏或反茧房规则。
-- `operational_instruction`: 当前任务、当前仓库、AGENTS、skill 执行步骤、隐私安全规则、工具使用约束等操作性指令。它们应优先约束当前任务，但默认不证明长期画像。
-- `agent_observation`: agent 对当前 session 的行为观察。除非反复、直接、低歧义，并且只影响协作流程，否则默认 pending。
+- Active profile exists: treat the task as an incremental update. Do not recommend the questionnaire by default.
+- No active profile exists: recommend the onboarding questionnaire. If the user asks for it, run the WebUI. If the user declines, continue with the current task and use proposals for any durable profile candidates.
 
-首次构建画像时，只有满足以下任一条件，才可说“当前上下文足够初始化而不启动问卷”：
-
-- 用户明确说不需要问卷，且当前 session 已提供覆盖至少 4 个问卷模块的 `durable_profile_evidence`。
-- 本地已有 active profile，当前任务只是增量更新，不是首次画像初始化。
-
-以下情况必须视为上下文不足，并启动或建议启动问卷：
-
-- 用户明确要求 WebUI、问卷、初始化问卷或首次构建画像。
-- 当前证据主要来自 AGENTS、系统/开发者指令、skill 操作规则或“请如何执行本任务”的约束。
-- 只能提取出语言、格式、隐私规则等少数 task-local 偏好，无法覆盖基本协作、沟通澄清、风险确认、隐私边界、能力边界和反茧房等核心模块。
-
-如果跳过问卷，输出必须列明：
-
-- 采用了哪些 `durable_profile_evidence`。
-- 覆盖了哪些问卷模块。
-- 为什么没有启动问卷。
-- 哪些内容只是当前任务约束，未写入长期 active profile。
+Do not decide that the current session is "enough" by counting covered questionnaire modules. Do not initialize an active profile from operational instructions.
 
 ## Session Inference Policy
 
-从 session 更新画像时，可以基于逻辑推理生成候选画像细节，但必须区分事实、自述、观察和假设：
-
-- 用户直接自述的背景、偏好和边界按 `self_report` 处理；年龄段、教育、专业、职业、长期目标等默认 `private`，先进入 proposal。
-- agent 推断的所在地、年龄、专业背景、职业身份、能力层级、性格或价值观等，必须使用 `source_type=inferred`，默认进入 pending proposal。
-- 推断候选的 `value` 必须包含 `summary`、`basis`、`reasoning`、`counter_evidence`、`usefulness` 和 `review_question`；证据不足时不要生成。
-- 单一弱信号推断置信度不得高于 `0.4`；多个一致信号通常不得高于 `0.6`；只有用户确认后才可升高置信度并进入 active。
-- 不得仅凭语言、时区、设备路径、文件名、IP、模型猜测或一次性任务内容推断真实所在地、民族、政治、宗教、健康、财务、法律风险或亲密经历。
-- 推断的目的只能是改善协作和追问，不得用于诊断、定型、评价人格或限制用户选择。
+- `source_type=inferred` always becomes a pending proposal. It never becomes active through `--auto-apply-safe`.
+- Explicit self-reported background information, including age range, education, field, role, experience stage, and long-term goals, becomes a pending proposal by default with `sensitivity=private`.
+- Use inference only to improve collaboration and follow-up questions. Avoid diagnosis, personality labels, value judgments, and restrictions on the user's choices.
 
 ## Workflow
 
-1. 识别用户：默认 `default`；用户明确指定新身份时用 `scripts/profile_store.py init --user <id>`。
-2. 读取当前状态：`scripts/profile_store.py read --user <id> --view clarification_summary`。
-3. 对首次初始化或空画像运行 Context Adequacy Gate；如果用户要求问卷或上下文不足，启动本地 WebUI 初始化问卷。
-4. 从当前 session 提取候选更新：提取与协作、需求对齐、沟通、能力边界、风险确认、隐私边界、背景上下文和长期帮助方向有关的信息，并区分长期画像证据和当前操作指令。
-5. 分类候选更新：
-   - 显式自述、低敏、无冲突：可用 `update-from-session --auto-apply-safe`。
-   - 用户自述但属于 `private` 的背景信息：生成 proposal，等待用户确认后进入 active。
-   - 推断、敏感、亲密经历、冲突、高影响：只生成 proposal，等待用户确认。
-   - 仅由当前任务/skill 操作指令支持的内容：默认不作为长期 active profile；如有必要，生成 pending proposal 或只在本次任务中使用。
-6. 写入或生成 proposal 后，输出本次新增、更新、跳过、待确认和隐私处理结果。
-7. 若用户要求初始化问卷，运行 `scripts/onboarding_webui.py --user <id>`，提交结果仍先进入 proposal。
+1. Identify the user. Use `default` unless the user explicitly names another identity. Initialize with `scripts/profile_store.py init --user <id>` when needed.
+2. Read current state with `scripts/profile_store.py read --user <id> --view clarification_summary`.
+3. Apply the Context Adequacy Gate. For first-run questionnaire requests, run `scripts/onboarding_webui.py --user <id>`.
+4. Extract candidate updates from the current session. Separate durable profile evidence from task-local instructions, AGENTS rules, repository constraints, and skill operating rules.
+5. Write safely:
+   - For clearly self-reported, low-sensitivity, non-conflicting collaboration facts, use `update-from-session --auto-apply-safe`. The script applies only candidates that pass safety checks and sends the rest to proposals.
+   - For every other candidate, create a proposal with `proposal-create` or `update-from-session` without relying on auto-apply.
+   - Report what was applied, proposed, redacted, skipped, and why.
 
-读 `references/update-policy.md` 判断自动应用、pending、冲突和勘误规则。读 `references/privacy-boundary.md` 判断敏感信息和安全边界。
+Read `references/update-policy.md` for auto-apply, pending, conflict, correction, and first-run rules. Read `references/privacy-boundary.md` for sensitivity boundaries.
 
 ## Storage And Tools
 
-主存储由 `scripts/profile_store.py` 管理：
+The main store is managed by `scripts/profile_store.py`:
 
-- `init`: 创建 registry、用户目录和 SQLite 数据库。
-- `read`: 读取 `clarification_summary`、`full` 或 `pending` 视图。
-- `read --view profile_overview`: 读取 low/private active 概览，省略更敏感内容和证据原文。
-- `update-from-session`: 用 agent 提取的候选 JSON 更新画像或生成 proposal。
-- `proposal-list` / `proposal-apply` / `proposal-reject`: 审核和应用候选更新。
-- `assertion-add` / `correct` / `delete` / `search` / `export`: 手动增删改查。
-- `validate`: 检查 schema、权限、WAL、孤儿证据和 pending 冲突。
+- `init`: create registry, user directory, and SQLite database.
+- `read`: read `clarification_summary`, `profile_overview`, `full`, or `pending`.
+- `update-from-session`: update from agent-extracted candidate JSON or create proposals.
+- `proposal-list` / `proposal-apply` / `proposal-reject`: review and apply pending updates.
+- `assertion-add` / `correct` / `delete` / `search` / `export`: manual CRUD and export.
+- `validate`: check schema, permissions, WAL mode, orphan evidence, and pending conflicts.
 
-读 `references/profile-schema.md` 获取数据结构和 JSON 输入格式。需要问卷时读 `references/questionnaire.md`。
+Read `references/profile-schema.md` for data structure and JSON input format. Read `references/questionnaire.md` when onboarding is needed.
 
 ## Read Views
 
-- `clarification_summary`: 只包含低敏、活跃、与需求对齐相关的摘要，供 `task-clarifier` 这类 skill 可选读取。
-- `profile_overview`: 本 skill 内部使用的 low/private 活跃概览，适合用户日常查看；不含 sensitive、intimate、secret，也不含证据原文。
-- `full`: 完整画像，仅在用户明确调用本 skill 并需要查看/维护时读取。
-- `pending`: 待确认 proposal，不作为稳定画像使用。
+- `clarification_summary`: low-sensitivity, active, need-alignment-related summary for optional use by skills such as `$task-clarifier`.
+- `profile_overview`: low/private active overview for this skill; excludes sensitive, intimate, secret, and raw evidence text.
+- `full`: full profile, only when the user explicitly invokes this skill for profile work.
+- `pending`: pending proposals; never treat them as stable profile facts.
 
-读 `references/task-clarifier-integration.md` 获取与 `$task-clarifier` 的边界。读 `references/examples.md` 获取典型调用样例。
+Read `references/task-clarifier-integration.md` for the `$task-clarifier` boundary. Read `references/examples.md` for typical usage.
 
 ## Safety Defaults
 
-- 不保存 secret、token、密码、私钥、验证码或可直接滥用的 credential。
-- 不把敏感经历、创伤、羞耻主题、健康、宗教、政治、财务、身份等推断静默写为 active。
-- 不因为长期画像覆盖当前对话中的明确新信息；用户当前说法优先。
-- 不把画像当诊断、道德判断或人格定型。画像只是协作偏好和需求对齐辅助证据。
+- Store no secrets, tokens, passwords, private keys, verification codes, or credentials.
+- Send sensitive experiences, health, religion, politics, finance, identity, intimate history, and similar content to proposal or redaction paths.
+- Current user statements override stored profile data.
+- Treat the profile as collaboration support and need-alignment evidence.
