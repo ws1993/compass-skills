@@ -1691,7 +1691,7 @@ requested number of sides.</code></pre>
               <figcaption>真实任务比抽象“最佳实践”更能暴露 skill 需要处理的边界。</figcaption>
             </figure>
 
-            <div class="grid-two">
+            <div class="grid-three">
               <div class="note-card">
                 <h3>推荐提炼顺序</h3>
                 <ol>
@@ -1701,6 +1701,15 @@ requested number of sides.</code></pre>
                   <li>审核后再生成完整 skill 内容，必要时先保留中文。</li>
                   <li>如果团队认为有必要，再把给 AI 读取的核心说明转成英文；这不是官方强制要求。</li>
                 </ol>
+              </div>
+              <div class="note-card">
+                <h3>压缩复杂度</h3>
+                <ul>
+                  <li>真实链路进入 skill 前要先压缩。完整执行里可能有很多步骤，正文只保留会改变执行路径的判断。</li>
+                  <li>长 pipeline 会把每个判断点都变成新的失败点；一次误判进入错误分支，后面的步骤会继续放大偏差。</li>
+                  <li>只有触发边界、权限风险、证据来源、工具选择、输出格式和停止条件这类关键分支，才值得写成路由。</li>
+                  <li>能靠上下文自然判断的细节，放进示例、reference 或脚本；不要把它们堆成连续路由。</li>
+                </ul>
               </div>
               <div class="note-card">
                 <h3>语言策略</h3>
@@ -1910,6 +1919,7 @@ description: Draft 3 concise Conventional Commit candidates
                       <div class="criterion"><b>2</b><span>是否先审核可读 workflow？</span></div>
                       <div class="criterion"><b>3</b><span>是否区分 AI 读取语言和用户输出语言？</span></div>
                       <div class="criterion"><b>4</b><span>`description` 是否准确、简洁、具体？</span></div>
+                      <div class="criterion"><b>5</b><span>是否只保留必要判断和路由？</span></div>
                     </div>
                   </div>
                   <div class="info-panel">
