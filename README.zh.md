@@ -5,36 +5,36 @@
 **司南：个性化 AI 任务总控 Skills 系统**  
 **COMPASS: Personal Alignment Skills OS for AI Agents**
 
-让 AI 懂你、看全局、不跑偏。COMPASS 把用户画像、任务图谱和需求对齐合成一个可复用的 skills system，让长任务、跨 session 协作和多 agent 工作不再散落在聊天记录里。
+COMPASS 提供三类本地 skills：用户画像、任务图谱和需求对齐。它把长任务、跨 session 协作和多 agent 工作从聊天记录里移到可查、可更新的本地结构中。
 
-## 30 秒看懂它怎么有用
+## 快速理解
 
 **场景 1：任务开始前，先避免做错。**
-当需求模糊、成本高或有安全风险时，用 `$task-clarifier` 把模糊想法对齐成三方一致的可执行需求：用户想清楚，agent 听准确，用户也能看见 agent 的理解没有跑偏。它会用最符合用户习惯的方式少问、问准、问到关键。
+当需求模糊、成本高或有安全风险时，用 `$task-clarifier` 把模糊想法整理成可执行需求：目标、范围、证据、验收标准和风险边界都写清楚。它会先读可用材料，只在关键分叉上提问或要求确认。
 
-这个 skill 只确保 3 件事：
+这个 skill 的验收标准：
 
-1. 帮助用户完全理解自己的需求。
-2. 帮助 AI 完全理解用户的需求。
-3. 让用户知道 AI 完全理解了他的需求。
+1. 用户能说清自己的目标和约束。
+2. agent 能复述可执行的范围和下一步。
+3. 用户能确认 agent 的理解没有偏离。
 
-**场景 2：任务进行中和结束后，自动构建任务树 / 任务森林。**
-用 `$task-forest` 自动把当前 session 分解成各个任务，并明确每个任务的目标、进度、偏差、依赖、待办和决策写成 proposal。确认后生成树视图、DAG 视图、任务详情卡和推荐队列，让下一个 agent 或下一个 session 继续时知道“这件事为什么做、做到哪、下一步做什么”。
+**场景 2：任务进行中和结束后，维护任务树 / 任务森林。**
+用 `$task-forest` 把当前 session 分解成各个任务，并把每个任务的目标、进度、偏差、依赖、待办和决策写成 proposal。确认后生成树视图、DAG 视图、任务详情卡和推荐队列，让下一个 agent 或下一个 session 继续时知道“这件事为什么做、做到哪、下一步做什么”。
 
-**场景 3：长期协作中，让 AI 越来越懂你但不越界。**
-用 `$user-profile-keeper` 在本地保存可审计、可纠错、可撤回的协作画像。它只保存用户确认或低敏的协作信号，不保存 secret，不上传数据；`$task-clarifier` 可读取低敏摘要来更贴合用户习惯地提问。没有画像时，`$task-clarifier` 依然可以独立工作并提供高质量对齐。
+**场景 3：长期协作中，保存本地协作画像。**
+用 `$user-profile-keeper` 在本地保存可审计、可纠错、可撤回的协作画像。画像只记录用户确认或低敏的协作信号；secret、token、密码、私钥和验证码不进入画像。`$task-clarifier` 可读取低敏摘要来调整提问方式；没有画像时，它依然按当前上下文工作。
 
-根据用户的每个 session 自动生成任务关系树视图与 session 更新流程：
+`$task-forest` 导出的任务关系树和 session 更新流程：
 
 ![task-forest tree demo](assets/task-forest-demo.gif)
 
-这个 GIF 是多个 session 运行当前 `$task-forest` skill 之后生成的 HTML 里展示的当前 repo 逐步完善的动态过程。
+这个 GIF 展示多个 session 更新后，当前 repo 的任务森林逐步成型。
 
-DAG 关系视图实况截图：
+DAG 关系视图：
 
 ![task-forest live DAG view](assets/task-forest-live-dag.png)
 
-自动生成的任务详情、目的、要求、证据和调度建议实况截图：
+任务详情、目的、要求、证据和调度建议：
 
 ![task-forest live detail view](assets/task-forest-live-detail.png)
 
@@ -44,13 +44,13 @@ DAG 关系视图实况截图：
 
 ## 为什么需要 COMPASS
 
-普通 agent 很擅长执行当前 prompt，但长任务经常会遇到三个问题：
+长任务需要持续保存三类信息：
 
-- **不了解用户**：不知道你的沟通偏好、风险边界、常见遗漏和长期协作方式。
-- **看不到全局**：新 session 只看到局部上下文，很难判断当前动作属于哪个长期目标。
-- **容易目标漂移**：做完一个任务后，才发现它和原始目的关系很弱，甚至根本不该做。
+- **用户信息**：沟通偏好、风险边界、常见遗漏和长期协作方式。
+- **任务全局**：当前动作属于哪个长期目标、依赖什么、推进到哪里。
+- **目标关系**：当前任务和原始目的之间的贡献关系，以及是否出现偏移。
 
-COMPASS 的核心目标是给 AI agent 一个长期工作底座：先理解用户，再看清任务森林，最后在每次行动前做目标对齐。
+COMPASS 提供一套长期协作流程：先读取用户协作画像，再查看任务森林，最后在行动前完成目标对齐。
 
 如果你还不熟悉 `SKILL.md` skills 的编写和使用方式，可以先看这个中文教程：[如何编写 Skills](https://dongshuyan.com/compass-skills/skill-writing-tutorial.html)。它是单文件静态 HTML，讲清楚 skill 的最小结构、渐进披露、复用审计、AI 生成草稿、真实链路提炼和迭代验证。
 
@@ -94,7 +94,7 @@ COMPASS 是一个 agent-agnostic 的 `SKILL.md` skills 包：凡是支持 `SKILL
 | OpenCode | 保留本 repo 的 `skills/` 和 [AGENTS.md](AGENTS.md)，让 agent 通过 AGENTS 规则发现并读取对应 `SKILL.md`。 |
 | 其他 agent | 只要能读取文件并运行本地脚本，就按 [AGENTS.md](AGENTS.md) 的通用协议加载：先读 `SKILL.md`，再按需读 `references/` 和运行 `scripts/`。 |
 
-**最简单的 agent-assisted 安装 prompt**
+**Agent-assisted 安装 prompt**
 
 把下面这段发给你正在使用的 AI agent。它应该先审查安全边界，再按当前 agent / harness 的真实安装路径复制 released skills；如果无法确定安装路径，只输出安装计划，不要猜路径写入。
 
@@ -122,13 +122,13 @@ $task-forest
 $task-clarifier
 ```
 
-## 三个核心 skills
+## 三个 skills
 
 ### $user-profile-keeper：本地用户画像
 
-`$user-profile-keeper` 维护一个只保存在本机的用户画像。它记录的是协作偏好、澄清方式、风险边界、能力边界和常见遗漏，不保存 secret，不上传数据，也不把完整画像暴露给其他 skill。`$task-clarifier` 只能读取低敏 `clarification_summary`，用于更精准地提问；没有画像时它也能正常工作。
+`$user-profile-keeper` 维护一个只保存在本机的用户画像。画像记录协作偏好、澄清方式、风险边界、能力边界和常见遗漏；secret、token、密码、私钥和验证码不得写入。`$task-clarifier` 只能读取低敏 `clarification_summary`，用于调整提问方式；没有画像时它也能正常工作。
 
-**重要提醒：** `$user-profile-keeper` 是本地明文存储，没有经过任何加密处理。本系列 skills 会约束自己不上传、不窃取、不读取 credential，但本地文件仍可能被同一台机器上的其他进程、备份系统或有权限的用户读取。请在充分理解风险后再使用，不要保存 secret、token、密码、私钥、验证码或高度敏感信息。
+**重要提醒：** `$user-profile-keeper` 是本地明文存储，没有经过任何加密处理。本系列 skills 的规则禁止上传、窃取或读取 credential；本地文件仍可能被同一台机器上的其他进程、备份系统或有权限的用户读取。请在充分理解风险后再使用，不要保存 secret、token、密码、私钥、验证码或高度敏感信息。
 
 **首次构建画像 prompt**
 
@@ -149,7 +149,7 @@ $task-clarifier
 请用 $user-profile-keeper 从当前 session 更新我的本地用户画像。
 
 请只提取对长期协作有价值的信息，例如沟通偏好、风险确认方式、常见遗漏、能力边界和隐私边界。
-低敏、明确、无冲突的信息可以自动应用；推断性、private、敏感或冲突信息必须进入 proposal 等我确认。
+低敏、明确、无冲突的信息可以直接应用；推断性、private、敏感或冲突信息必须进入 proposal 等我确认。
 不要保存 secret、token、密码、私钥、验证码或浏览器 session 信息。
 ```
 
@@ -190,18 +190,18 @@ $task-clarifier
 
 ## 能做什么
 
-- 新 session 结束时，自动把进度、偏差、决策和待办归入全局任务图。（用户可以自行做成 hook）
+- 新 session 结束时，把进度、偏差、决策和待办归入全局任务图。（用户可以自行做成 hook）
 - 当一个新任务找不到父节点或贡献关系时，也就是不知道当前 session 为什么要做时，提醒用户重新确认目标，确保当前 session 符合全局目标、不偏离。
 - 在任务变复杂、变危险、变模糊时，先进入 alignment gate，避免返工和隐私风险。
 - 让用户画像影响“怎么问”，当前上下文始终优先，历史偏好只作为参考。
-- 为后续日报、周报、任务排序、习惯系统、多 agent 总控、自进化 skill 生态提供结构化底座。
+- 为后续日报、周报、任务排序、习惯系统、多 agent 总控和 skill 升级提供结构化数据。
 
 ## 安全和隐私
 
 COMPASS 的默认安全边界：
 
 - 不联网、不上传用户画像、不读取浏览器 cookie、token 或 credential。
-- `$user-profile-keeper` 默认是本地明文存储；它保护的是“不上传、不扩散、可审计、可删除”。它没有加密防护层，用户需要自行判断是否安装使用。
+- `$user-profile-keeper` 默认是本地明文存储；它的边界是本地保存、可审计、可删除。它没有加密防护层，用户需要自行判断是否安装使用。
 - 不把完整用户画像提供给普通 skill；只允许读取低敏 `clarification_summary`。
 - `$task-forest` 的完整任务图保存在 repo-local 目录，不把节点正文写入全局 registry。
 - 删除、覆盖、发布、远程写入、credential、全局配置等高风险动作必须确认。
@@ -220,7 +220,7 @@ COMPASS 的默认安全边界：
 - `$session-handoff-prompt`：把长 session 压缩成可续接 prompt，并读取 `$task-forest` 作为结构化来源。
 - 本机代理控制室：汇总多个本地 agent 的运行、等待、卡住、风险和待 review 状态。
 - 等待间隙任务路由：根据等待时间、精力、切换成本和 `$task-forest` todo 推荐可处理的小任务。
-- 日报 / 周报 / 项目复盘：基于用户画像和任务森林自动生成更贴合用户目标的报告。
+- 日报 / 周报 / 项目复盘：基于用户画像和任务森林生成更贴合用户目标的报告。
 - 任务排序和 deadline planning：结合任务重量、用户能力、上下文切换成本和 deadline 推荐执行顺序。
 - 健康习惯和节奏系统：用任务森林观察长期负载，帮助用户安排更可持续的工作节奏。
 

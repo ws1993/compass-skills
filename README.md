@@ -6,7 +6,7 @@
 npx skills add dongshuyan/compass-skills --skill '*' -a claude-code
 ```
 
-COMPASS Skills is a local-first skill suite for AI coding agents. It keeps user data local while helping agents clarify ambiguous work, preserve long-running project context, and adapt collaboration style.
+COMPASS Skills gives AI coding agents three local skills: task clarification, repo-local task memory, and a local collaboration profile.
 
 The project currently ships three `SKILL.md` skills:
 
@@ -48,30 +48,30 @@ For manual installation, copy the three folders under [`skills/`](skills/) into 
 
 ## Why COMPASS Exists
 
-Most agents handle the current prompt well. Long-running work needs stronger memory, alignment, and risk control:
+Long-running agent work needs three kinds of state:
 
-- The agent may lack the user's communication style, risk boundaries, or recurring omissions.
-- A new session often sees only local context and misses the broader project.
-- Work can look productive while drifting away from the user's real goal.
+- User context: communication preferences, risk boundaries, recurring omissions, and collaboration style.
+- Project context: where the current request fits, what it depends on, and how far it has progressed.
+- Goal context: how the current task contributes to the original objective and whether it still matches it.
 
-COMPASS gives agents a durable operating layer:
+COMPASS organizes that state into three local workflows:
 
-1. **Know the user** through a local profile that the user can inspect and correct.
-2. **Know the work** through a repo-local task graph that survives session boundaries.
-3. **Know the direction** through a clarification gate before ambiguous or risky execution.
+1. A local profile that the user can inspect and correct.
+2. A repo-local task graph that survives session boundaries.
+3. A clarification gate before ambiguous or risky execution.
 
 ## How The Three Skills Work Together
 
 `task-clarifier` is the entry point for ambiguous, high-cost, high-risk, evidence-sensitive, or externally visible work. It decides whether the agent should proceed, research first, ask a narrow question, confirm risk, offer workflow options, or block.
 
-`task-forest` records durable work structure: why a task exists, where it fits, how far it progressed, what changed, and what remains unresolved.
+`task-forest` records long-running work structure: why a task exists, where it fits, how far it progressed, what changed, and what remains unresolved.
 
-`user-profile-keeper` stores collaboration preferences locally. The stored profile is intentionally narrow: future sessions use it to ask better questions and apply the right risk boundary. Current files, logs, and user-provided context remain the authority, and secrets stay out of the profile.
+`user-profile-keeper` stores collaboration preferences locally. Future sessions use the profile to ask relevant questions and apply the right risk boundary. Current files, logs, and user-provided context remain the authority; secrets stay out of the profile.
 
 ```text
 user-profile-keeper -> who is the user and how should we collaborate?
-task-forest         -> where does this task fit and is it drifting?
-task-clarifier      -> what exactly should the agent do now?
+task-forest         -> where does this task fit and is it still aligned?
+task-clarifier      -> what should the agent do now?
 ```
 
 ## Screenshots
@@ -110,7 +110,7 @@ The scripts use Python standard-library components and run locally.
 
 ## Safety Model
 
-COMPASS is local-first by design:
+COMPASS keeps runtime data local:
 
 - No upload of task data or user-profile data.
 - No browser cookie, token, private key, credential, or session extraction.
@@ -140,7 +140,7 @@ Maintain the task forest for a workspace:
 ```text
 Use $task-forest to analyze the current session and maintain the task forest for this workspace.
 
-Goal: turn durable goals, tasks, progress, deviations, risks, decisions, and follow-ups from this session into a task-forest proposal.
+Goal: create a task-forest proposal from long-running goals, tasks, progress, deviations, risks, decisions, and follow-ups in this session.
 Requirements:
 1. Read the current task-forest list and todo first; initialize task-forest if missing.
 2. Identify which long-term goal this session served. If no relation is clear, ask me or create a question/risk node.
