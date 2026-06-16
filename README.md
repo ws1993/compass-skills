@@ -6,7 +6,7 @@
 npx skills add dongshuyan/compass-skills --skill '*' -a claude-code
 ```
 
-COMPASS Skills is a local-first skill suite for AI coding agents. It helps agents clarify ambiguous work, preserve long-running project context, and adapt collaboration style without uploading user data.
+COMPASS Skills is a local-first skill suite for AI coding agents. It keeps user data local while helping agents clarify ambiguous work, preserve long-running project context, and adapt collaboration style.
 
 The project currently ships three `SKILL.md` skills:
 
@@ -18,7 +18,7 @@ The project currently ships three `SKILL.md` skills:
 
 ## Quick Start
 
-List the available skills without installing:
+List the available skills before installing:
 
 ```bash
 npx skills add dongshuyan/compass-skills --list
@@ -44,14 +44,14 @@ $task-forest
 $user-profile-keeper
 ```
 
-If your agent does not support the `skills` CLI, copy the three folders under [`skills/`](skills/) into the agent's local skills directory and keep their `references/`, `scripts/`, and `agents/` subdirectories intact.
+For manual installation, copy the three folders under [`skills/`](skills/) into the agent's local skills directory and keep their `references/`, `scripts/`, and `agents/` subdirectories intact.
 
 ## Why COMPASS Exists
 
-Most agents handle the current prompt well. Long-running work breaks in different ways:
+Most agents handle the current prompt well. Long-running work needs stronger memory, alignment, and risk control:
 
-- The agent does not know the user's communication style, risk boundaries, or recurring omissions.
-- A new session cannot reliably place a request inside the broader project.
+- The agent may lack the user's communication style, risk boundaries, or recurring omissions.
+- A new session often sees only local context and misses the broader project.
 - Work can look productive while drifting away from the user's real goal.
 
 COMPASS gives agents a durable operating layer:
@@ -64,9 +64,9 @@ COMPASS gives agents a durable operating layer:
 
 `task-clarifier` is the entry point for ambiguous, high-cost, high-risk, evidence-sensitive, or externally visible work. It decides whether the agent should proceed, research first, ask a narrow question, confirm risk, offer workflow options, or block.
 
-`task-forest` records durable work structure. It does not execute tasks itself; it tracks why a task exists, where it fits, how far it progressed, what changed, and what remains unresolved.
+`task-forest` records durable work structure: why a task exists, where it fits, how far it progressed, what changed, and what remains unresolved.
 
-`user-profile-keeper` stores collaboration preferences locally. It is intentionally narrow: it helps future sessions ask better questions and apply the right risk boundary, but it does not replace current evidence or save secrets.
+`user-profile-keeper` stores collaboration preferences locally. The stored profile is intentionally narrow: future sessions use it to ask better questions and apply the right risk boundary. Current files, logs, and user-provided context remain the authority, and secrets stay out of the profile.
 
 ```text
 user-profile-keeper -> who is the user and how should we collaborate?
@@ -98,7 +98,7 @@ Ecosystem map:
 
 ## Compatibility
 
-COMPASS is not tied to one agent runtime. It is a `SKILL.md` package with Markdown instructions, YAML frontmatter, optional `references/`, optional `scripts/`, and optional agent metadata.
+COMPASS works across agent runtimes as a `SKILL.md` package with Markdown instructions, YAML frontmatter, optional `references/`, optional `scripts/`, and optional agent metadata.
 
 | Agent / environment | Recommended setup |
 | --- | --- |
@@ -106,7 +106,7 @@ COMPASS is not tied to one agent runtime. It is a `SKILL.md` package with Markdo
 | Codex | Use the `skills` CLI with `-a codex` when supported by your environment, or use the repo as a local skills source. |
 | OpenCode / OpenClaw / other agents | Keep [`AGENTS.md`](AGENTS.md) and load the matching `SKILL.md` first, then use `references/` and `scripts/` as needed. |
 
-The scripts use Python standard-library components. They do not require a hosted service.
+The scripts use Python standard-library components and run locally.
 
 ## Safety Model
 
@@ -118,7 +118,7 @@ COMPASS is local-first by design:
 - `user-profile-keeper` stores local profile data under `.compass-skills/user-profiles/v1` by default, or a user-selected `COMPASS_USER_PROFILE_HOME`.
 - High-risk actions such as deletion, overwrite, publishing, remote writes, credential use, and global configuration changes require explicit confirmation.
 
-Important: `user-profile-keeper` uses local plaintext storage. It is not an encrypted vault. Do not store passwords, tokens, private keys, verification codes, or highly sensitive personal data in the profile.
+Important: `user-profile-keeper` uses local plaintext storage without encryption. Do not store passwords, tokens, private keys, verification codes, or highly sensitive personal data in the profile.
 
 See [SECURITY.md](SECURITY.md) for the security boundary.
 
@@ -131,7 +131,7 @@ Use $task-clarifier to align the task below.
 
 Task: ...
 Material: ...
-Constraints: do not ask what can be inferred from files, context, or reliable sources. Ask only questions that change scope, method, evidence, format, safety, or acceptance criteria.
+Constraints: infer what you can from files, context, or reliable sources. Ask only questions that change scope, method, evidence, format, safety, or acceptance criteria.
 Output: decide whether to proceed, research-first, ask, confirm, offer-method-choice, or block, and explain why.
 ```
 
@@ -143,7 +143,7 @@ Use $task-forest to analyze the current session and maintain the task forest for
 Goal: turn durable goals, tasks, progress, deviations, risks, decisions, and follow-ups from this session into a task-forest proposal.
 Requirements:
 1. Read the current task-forest list and todo first; initialize task-forest if missing.
-2. Identify which long-term goal this session served. If no relation is clear, do not force an edge; ask me or create a question/risk node.
+2. Identify which long-term goal this session served. If no relation is clear, ask me or create a question/risk node.
 3. Save a proposal and show me the planned changes before applying.
 4. After approval, apply, validate, export, and report the HTML path.
 ```

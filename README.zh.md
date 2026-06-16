@@ -10,7 +10,7 @@
 ## 30 秒看懂它怎么有用
 
 **场景 1：任务开始前，先避免做错。**
-当需求模糊、成本高或有安全风险时，用 `$task-clarifier` 把模糊想法对齐成三方一致的可执行需求：用户想清楚，agent 听准确，用户也能看见 agent 的理解没有跑偏。它不是多问问题，而是用最符合用户习惯的方式少问、问准、问到关键。
+当需求模糊、成本高或有安全风险时，用 `$task-clarifier` 把模糊想法对齐成三方一致的可执行需求：用户想清楚，agent 听准确，用户也能看见 agent 的理解没有跑偏。它会用最符合用户习惯的方式少问、问准、问到关键。
 
 这个 skill 只确保 3 件事：
 
@@ -84,7 +84,7 @@ $task-clarifier 让 AI 知道“用户的需求到底是什么”。
 - `$user-profile-keeper` 数据默认保存在用户目录下的 `.compass-skills/user-profiles/v1`，可用 `COMPASS_USER_PROFILE_HOME` 改到其他本地目录。
 - 所有正式写入都在本地文件或本地 SQLite 内完成；没有网络上传、浏览器 cookie 读取、credential 读取或远程写入。
 
-COMPASS 不是 Codex-only。它是一个 agent-agnostic 的 `SKILL.md` skills 包：凡是支持 `SKILL.md`、YAML frontmatter、Markdown instructions、可选 `scripts/` / `references/` 的 agent，都可以原生或近原生使用；暂不原生支持 skills 的 agent，可以通过根目录 [AGENTS.md](AGENTS.md) 做轻量适配。
+COMPASS 是一个 agent-agnostic 的 `SKILL.md` skills 包：凡是支持 `SKILL.md`、YAML frontmatter、Markdown instructions、可选 `scripts/` / `references/` 的 agent，都可以原生或近原生使用；暂不原生支持 skills 的 agent，可以通过根目录 [AGENTS.md](AGENTS.md) 做轻量适配。
 
 | Agent / 环境 | 推荐接入方式 |
 | --- | --- |
@@ -128,7 +128,7 @@ $task-clarifier
 
 `$user-profile-keeper` 维护一个只保存在本机的用户画像。它记录的是协作偏好、澄清方式、风险边界、能力边界和常见遗漏，不保存 secret，不上传数据，也不把完整画像暴露给其他 skill。`$task-clarifier` 只能读取低敏 `clarification_summary`，用于更精准地提问；没有画像时它也能正常工作。
 
-**重要提醒：** `$user-profile-keeper` 是本地明文存储，不是加密保险箱。本系列 skills 会约束自己不上传、不窃取、不读取 credential，但本地文件仍可能被同一台机器上的其他进程、备份系统或有权限的用户读取。请在充分理解风险后再使用，不要保存 secret、token、密码、私钥、验证码或高度敏感信息。
+**重要提醒：** `$user-profile-keeper` 是本地明文存储，没有经过任何加密处理。本系列 skills 会约束自己不上传、不窃取、不读取 credential，但本地文件仍可能被同一台机器上的其他进程、备份系统或有权限的用户读取。请在充分理解风险后再使用，不要保存 secret、token、密码、私钥、验证码或高度敏感信息。
 
 **首次构建画像 prompt**
 
@@ -155,7 +155,7 @@ $task-clarifier
 
 ### $task-forest：任务森林和进度总控
 
-`$task-forest` 在当前 repo 内维护任务森林 / DAG。它不替你执行任务，而是维护任务结构：长期目标、子任务、依赖、进度、偏差、待办、决策和 session 历史。导出的 HTML 可以离线查看树视图、DAG 视图、历史变化和待复核节点。
+`$task-forest` 在当前 repo 内维护任务森林 / DAG，负责记录长期目标、子任务、依赖、进度、偏差、待办、决策和 session 历史。导出的 HTML 可以离线查看树视图、DAG 视图、历史变化和待复核节点。
 
 **构建或更新任务森林 prompt**
 
@@ -173,7 +173,7 @@ $task-clarifier
 
 ### $task-clarifier：需求对齐和风险门禁
 
-`$task-clarifier` 是低打扰但强对齐的任务路由器。它把模糊想法对齐成三方一致的可执行需求：用户想清楚，agent 听准确，用户也能确认 agent 没理解偏。它不会把每个不确定性都变成问题，而是判断：能不能先读文件、是否需要联网、是否该问用户、是否必须确认风险、或者是否应该阻塞。
+`$task-clarifier` 是低打扰但强对齐的任务路由器。它把模糊想法对齐成三方一致的可执行需求：用户想清楚，agent 听准确，用户也能确认 agent 没理解偏。它会先判断下一步路径：读文件、联网查证、问关键问题、确认风险，或者直接阻塞。
 
 如果安装了 `$user-profile-keeper`，`$task-clarifier` 可以读取低敏画像摘要，让提问方式更符合用户习惯；如果没有，它仍会根据当前上下文、文件和证据正常工作。
 
@@ -191,9 +191,9 @@ $task-clarifier
 ## 能做什么
 
 - 新 session 结束时，自动把进度、偏差、决策和待办归入全局任务图。（用户可以自行做成 hook）
-- 当一个新任务找不到父节点或贡献关系时，也就是不知道当前 session 为什么要做时，提醒用户重新确认目标，而不是强行继续，从而确保当前 session 符合全局目标、不偏离。
+- 当一个新任务找不到父节点或贡献关系时，也就是不知道当前 session 为什么要做时，提醒用户重新确认目标，确保当前 session 符合全局目标、不偏离。
 - 在任务变复杂、变危险、变模糊时，先进入 alignment gate，避免返工和隐私风险。
-- 让用户画像影响“怎么问”，但不替代当前上下文，也不把历史偏好当成绝对事实。
+- 让用户画像影响“怎么问”，当前上下文始终优先，历史偏好只作为参考。
 - 为后续日报、周报、任务排序、习惯系统、多 agent 总控、自进化 skill 生态提供结构化底座。
 
 ## 安全和隐私
@@ -201,7 +201,7 @@ $task-clarifier
 COMPASS 的默认安全边界：
 
 - 不联网、不上传用户画像、不读取浏览器 cookie、token 或 credential。
-- `$user-profile-keeper` 默认是本地明文存储；它保护的是“不上传、不扩散、可审计、可删除”，不是加密防护。所以用户需要自行判断是否安装使用。
+- `$user-profile-keeper` 默认是本地明文存储；它保护的是“不上传、不扩散、可审计、可删除”。它没有加密防护层，用户需要自行判断是否安装使用。
 - 不把完整用户画像提供给普通 skill；只允许读取低敏 `clarification_summary`。
 - `$task-forest` 的完整任务图保存在 repo-local 目录，不把节点正文写入全局 registry。
 - 删除、覆盖、发布、远程写入、credential、全局配置等高风险动作必须确认。

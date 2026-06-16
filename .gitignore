@@ -50,3 +50,6 @@ id_ed25519*
 # Private source screenshots used only to derive sanitized public assets
 /assets/html.png
 /assets/dag.png
+
+# Local-only forum promotion drafts
+/LOCAL_FORUM_PROMOTION_DRAFT.zh.md
