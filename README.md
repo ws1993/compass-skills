@@ -185,3 +185,7 @@ MIT. See [LICENSE](LICENSE).
 ## Community
 
 The project is developed publicly at [dongshuyan/compass-skills](https://github.com/dongshuyan/compass-skills).
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=dongshuyan/compass-skills&type=Date)](https://www.star-history.com/#dongshuyan/compass-skills&Date)

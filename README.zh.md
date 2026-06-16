@@ -231,3 +231,7 @@ COMPASS 的默认安全边界：
 ## 社区讨论
 
 - 当前 repo 已经分享开源至 [Linux.do](https://linux.do/)。
+
+## Star 趋势
+
+[![Star History Chart](https://api.star-history.com/svg?repos=dongshuyan/compass-skills&type=Date)](https://www.star-history.com/#dongshuyan/compass-skills&Date)
