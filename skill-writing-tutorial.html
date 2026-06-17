@@ -1241,6 +1241,32 @@
       line-height: 1.7;
     }
 
+    .repo-source {
+      width: fit-content;
+      max-width: 100%;
+      margin: 0;
+      padding: 10px 12px;
+      border: 1px solid #c9d8e5;
+      border-radius: 8px;
+      background: #f7fafc;
+      color: #405066;
+      font-size: 14px;
+      font-weight: 750;
+      line-height: 1.5;
+    }
+
+    .repo-source a {
+      color: var(--blue);
+      text-decoration: none;
+      overflow-wrap: anywhere;
+    }
+
+    .repo-source a:hover,
+    .repo-source a:focus-visible {
+      text-decoration: underline;
+      outline: none;
+    }
+
     .repo-install {
       margin: 0;
     }
@@ -3005,12 +3031,14 @@ Trigger tests:
           <div class="section-inner">
             <div class="section-head">
               <span class="section-number">13</span>
-              <h2>司南 COMPASS 仓库</h2>
+              <h2 data-i18n-en="司南 COMPASS Skill OS">司南 COMPASS Skill 系统</h2>
               <p>COMPASS 提供三类本地 skills：用户画像、任务图谱和需求对齐。它把长任务、跨 session 协作和多 agent 工作从聊天记录里移到可查、可更新的本地结构中。</p>
             </div>
 
             <div class="repo-intro">
               <p class="repo-lead">这三个 skills 互相配合：`$user-profile-keeper` 让 agent 知道“你是谁、怎么协作”，`$task-forest` 让 agent 知道“任务在哪里、做到哪里、为什么做”，`$task-clarifier` 让 agent 在行动前确认“用户的需求到底是什么”。它们都围绕本地文件工作，不上传用户数据，也不读取 credential、浏览器 cookie 或远程会话。</p>
+
+              <p class="repo-source"><span data-i18n-en="GitHub repository:">GitHub 仓库：</span> <a href="https://github.com/dongshuyan/compass-skills" target="_blank" rel="noopener noreferrer">dongshuyan/compass-skills</a></p>
 
               <div class="code-block repo-install">
                 <div class="code-title"><span>一键安装</span><span>Codex + Claude Code</span></div>
