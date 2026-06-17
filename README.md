@@ -188,7 +188,7 @@ MIT. See [LICENSE](LICENSE).
 
 ## Community
 
-The project is developed publicly at [dongshuyan/compass-skills](https://github.com/dongshuyan/compass-skills).
+- This repo has been shared as open source on [Linux.do](https://linux.do/).
 
 ## Star History
 
