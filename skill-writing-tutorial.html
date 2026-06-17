@@ -941,6 +941,67 @@
       white-space: nowrap;
     }
 
+    .condition-table .condition-group-row th {
+      position: relative;
+      padding: 15px 16px;
+      border-right: 0;
+      border-bottom-color: #cbd8e5;
+      background: linear-gradient(90deg, rgba(23, 105, 224, 0.1), #f8fbff 46%);
+    }
+
+    .condition-table .condition-group-row th::before {
+      content: "";
+      position: absolute;
+      top: 10px;
+      bottom: 10px;
+      left: 0;
+      width: 5px;
+      border-radius: 0 4px 4px 0;
+      background: var(--blue);
+    }
+
+    .condition-group-row:not(:first-child) th {
+      border-top: 10px solid #fbfdff;
+    }
+
+    .condition-group-row.group-p1 th {
+      background: linear-gradient(90deg, rgba(30, 143, 104, 0.11), #f8fbff 46%);
+    }
+
+    .condition-group-row.group-p1 th::before {
+      background: var(--green);
+    }
+
+    .condition-group-row.group-p2 th {
+      background: linear-gradient(90deg, rgba(213, 138, 31, 0.14), #fffdf8 46%);
+    }
+
+    .condition-group-row.group-p2 th::before {
+      background: var(--amber);
+    }
+
+    .condition-group-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-right: 12px;
+      color: var(--navy);
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    .condition-group-desc {
+      color: #53667d;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: normal;
+    }
+
+    .condition-table tbody tr:not(.condition-group-row):hover td {
+      background: #fbfdff;
+    }
+
     .condition-table th:last-child,
     .condition-table td:last-child {
       border-right: 0;
@@ -1941,7 +2002,7 @@ requested number of sides.</code></pre>
             <div class="section-head">
               <span class="section-number">8</span>
               <h2>稳定 Skill 的质量门槛</h2>
-              <p>最符合要求的 skill 是：从真实反复任务中提炼出来，`description` 触发边界准确，`SKILL.md` 只保留关键流程和少量强路由，长资料放 `references/`，重复易错动作放 `scripts/`，并且用正例、反例、工具验证和 with/without 测试证明它确实让任务更稳定的 skill。</p>
+              <p>最符合要求的 skill 是：从真实反复任务中提炼出来，`description` 触发边界准确，`SKILL.md` 保留连续可读的核心流程和少量强路由，长资料放 `references/`，重复易错动作放 `scripts/`，并且用正例、反例、工具验证和 with/without 测试证明它确实让任务更稳定的 skill。</p>
             </div>
 
             <div class="condition-panel" aria-labelledby="condition-ladder-title">
@@ -1958,6 +2019,9 @@ requested number of sides.</code></pre>
                     </tr>
                   </thead>
                   <tbody>
+                    <tr class="condition-group-row group-p0">
+                      <th colspan="4" scope="rowgroup"><span class="condition-group-title">P0 · 选题与素材</span><span class="condition-group-desc">先确认 skill 是否值得做，以及素材是否来自真实链路。</span></th>
+                    </tr>
                     <tr>
                       <td class="condition-rank">01</td>
                       <td><span class="priority-chip">P0</span><span class="category-label">选题与素材</span></td>
@@ -1970,6 +2034,9 @@ requested number of sides.</code></pre>
                       <td>从真实跑通过的链路提炼</td>
                       <td>真实 trace 能暴露工具顺序、失败恢复、验证命令和停止条件；凭空设计容易写成抽象口号。</td>
                     </tr>
+                    <tr class="condition-group-row group-p0">
+                      <th colspan="4" scope="rowgroup"><span class="condition-group-title">P0 · 触发边界</span><span class="condition-group-desc">让 skill 准确触发，并用反例约束误触发。</span></th>
+                    </tr>
                     <tr>
                       <td class="condition-rank">03</td>
                       <td><span class="priority-chip">P0</span><span class="category-label">触发边界</span></td>
@@ -1981,6 +2048,9 @@ requested number of sides.</code></pre>
                       <td><span class="priority-chip">P0</span><span class="category-label">触发边界</span></td>
                       <td>有明确不触发条件和反例</td>
                       <td>反例能防止 skill 过宽，避免关键词相似但任务目标不同的请求误触发。</td>
+                    </tr>
+                    <tr class="condition-group-row group-p0">
+                      <th colspan="4" scope="rowgroup"><span class="condition-group-title">P0 · 路由与判断</span><span class="condition-group-desc">保留少数强分支，把判断接到用户、工具或证据。</span></th>
                     </tr>
                     <tr>
                       <td class="condition-rank">05</td>
@@ -2006,6 +2076,9 @@ requested number of sides.</code></pre>
                       <td>机器能判的交给工具</td>
                       <td>YAML、schema、lint、测试、diff、文件存在性属于可验证事实，工具检查比主观判断稳定。</td>
                     </tr>
+                    <tr class="condition-group-row group-p1">
+                      <th colspan="4" scope="rowgroup"><span class="condition-group-title">P1 · 结构与资源</span><span class="condition-group-desc">核心路径连续可读，资源按职责边界和读取条件拆分。</span></th>
+                    </tr>
                     <tr>
                       <td class="condition-rank">09</td>
                       <td><span class="priority-chip">P1</span><span class="category-label">结构与资源</span></td>
@@ -2021,41 +2094,53 @@ requested number of sides.</code></pre>
                     <tr>
                       <td class="condition-rank">11</td>
                       <td><span class="priority-chip">P1</span><span class="category-label">结构与资源</span></td>
-                      <td>重复且易错的操作脚本化</td>
-                      <td>脚本比每次重写代码更稳定，也能被测试和复用。</td>
+                      <td>抽象边界清楚，避免微型拆分</td>
+                      <td>核心执行路径要连续可读；只有内容有独立职责边界、独立读取条件、稳定复用价值、机器验证价值，或会显著拖长主流程时，才拆到 `references/`、`scripts/`、`evals/` 或 companion skill。</td>
                     </tr>
                     <tr>
                       <td class="condition-rank">12</td>
+                      <td><span class="priority-chip">P1</span><span class="category-label">结构与资源</span></td>
+                      <td>重复且易错的操作脚本化</td>
+                      <td>脚本比每次重写代码更稳定，也能被测试和复用。</td>
+                    </tr>
+                    <tr class="condition-group-row group-p1">
+                      <th colspan="4" scope="rowgroup"><span class="condition-group-title">P1 · 风险与验收</span><span class="condition-group-desc">明确停止条件、输出契约和基础结构验证。</span></th>
+                    </tr>
+                    <tr>
+                      <td class="condition-rank">13</td>
                       <td><span class="priority-chip">P1</span><span class="category-label">风险与验收</span></td>
                       <td>有安全停止条件</td>
                       <td>删除、发布、push、凭据、全局配置、外部副作用等必须显式确认，避免 skill 自动越界。</td>
                     </tr>
                     <tr>
-                      <td class="condition-rank">13</td>
+                      <td class="condition-rank">14</td>
                       <td><span class="priority-chip">P1</span><span class="category-label">风险与验收</span></td>
                       <td>有稳定输出格式和验收标准</td>
                       <td>输出模板、字段、长度、文件路径、测试命令让结果可检查，减少“看起来完成了”的假完成。</td>
                     </tr>
                     <tr>
-                      <td class="condition-rank">14</td>
+                      <td class="condition-rank">15</td>
                       <td><span class="priority-chip">P1</span><span class="category-label">风险与验收</span></td>
                       <td>通过基础结构验证</td>
                       <td>至少跑 `quick_validate.py`，确保 `SKILL.md`、frontmatter、命名、description 基本合法。</td>
                     </tr>
+                    <tr class="condition-group-row group-p2">
+                      <th colspan="4" scope="rowgroup"><span class="condition-group-title">P2 · 测试与迭代</span><span class="condition-group-desc">用真实 prompt、对照和 holdout 防止纸面改进。</span></th>
+                    </tr>
                     <tr>
-                      <td class="condition-rank">15</td>
+                      <td class="condition-rank">16</td>
                       <td><span class="priority-chip">P2</span><span class="category-label">测试与迭代</span></td>
                       <td>用真实 prompt 和负例验证触发</td>
                       <td>好的触发测试要包含 should-trigger 和 should-not-trigger，尤其是近邻负例。</td>
                     </tr>
                     <tr>
-                      <td class="condition-rank">16</td>
+                      <td class="condition-rank">17</td>
                       <td><span class="priority-chip">P2</span><span class="category-label">测试与迭代</span></td>
                       <td>做 with/without 或旧版/新版对照</td>
                       <td>只有对照后才能判断 skill 是否真的提升稳定性；单纯增加说明层不等于质量提升。</td>
                     </tr>
                     <tr>
-                      <td class="condition-rank">17</td>
+                      <td class="condition-rank">18</td>
                       <td><span class="priority-chip">P2</span><span class="category-label">测试与迭代</span></td>
                       <td>迭代时提炼共性，避免单例特判</td>
                       <td>一次失败只能作为线索；进入 skill 的规则应覆盖一类稳定问题，并有反例或 holdout 检查。</td>
@@ -2063,7 +2148,7 @@ requested number of sides.</code></pre>
                   </tbody>
                 </table>
               </div>
-              <p class="condition-bottom">稳定 skill 依赖少数关键规则：触发准确、执行路径清楚、结果可验证、反例能约束边界。下一节继续展开路由设计：把弱判断从热路径移出，把必要判断接到用户、脚本、测试、schema、diff 或外部证据上。形式底线：`name` 用小写连字符，短且可识别；`description` 准确、具体、不过长；`SKILL.md` 有 YAML frontmatter 和正文；资源目录只放会被执行或按需读取的内容；`agents/openai.yaml` 承载 UI 元数据、默认 prompt 和工具依赖；skill 的触发设计放在 `description` 和 `SKILL.md`。</p>
+              <p class="condition-bottom">稳定 skill 依赖少数关键规则：触发准确、核心路径连续、结果可验证、反例能约束边界。下一节继续展开路由设计：把弱判断从热路径移出，把必要判断接到用户、脚本、测试、schema、diff 或外部证据上。形式底线：`name` 用小写连字符，短且可识别；`description` 准确、具体、不过长；`SKILL.md` 有 YAML frontmatter 和正文；资源目录只放有独立职责边界、读取条件、执行用途或产物用途的内容；`agents/openai.yaml` 承载 UI 元数据、默认 prompt 和工具依赖；skill 的触发设计放在 `description` 和 `SKILL.md`。</p>
             </div>
           </div>
         </section>
