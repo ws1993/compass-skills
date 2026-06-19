@@ -7,6 +7,7 @@ COMPASS is designed as a local-first skills system.
 - `user-profile-keeper` stores profile data locally under `.compass-skills/user-profiles/v1` in the user's home directory by default.
 - Profile storage is plaintext local storage. It is not encrypted by default and should not be treated as a secure vault.
 - `task-forest` stores task data inside the current workspace under `.agent-workbench/task-forest/`.
+- `session-handoff-prompt` is read-only by default. It creates continuation prompts from the current conversation, explicit transcript/log files, workspace evidence, and optional task-forest exports.
 - `task-clarifier` does not write persistent data.
 - The skills do not upload profile data, task data, credentials, or browser session information.
 
@@ -31,6 +32,7 @@ The released skills do not publish, push, upload, email, schedule, or remotely w
 
 - Task graph writes must go through `task-forest/scripts/task_forest.py`.
 - Profile writes must go through `user-profile-keeper/scripts/profile_store.py`.
+- Session handoff prompts can preserve local workspace paths for same-machine continuation. Use `session-handoff-prompt/scripts/redact_handoff.py --privacy shareable` before sharing a handoff outside the local machine or trusted agent session.
 - HTML task-forest exports are static offline views and do not modify the task graph.
 
 ## Reporting Issues

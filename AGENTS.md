@@ -6,7 +6,7 @@ This repository contains agent-agnostic `SKILL.md` skills. Use this file when yo
 
 - Available skills live under `skills/<skill-name>/SKILL.md`.
 - Read each skill's YAML frontmatter `name` and `description` to decide whether it applies.
-- Prefer explicit user invocation such as `$task-clarifier`, `$task-forest`, or `$user-profile-keeper`.
+- Prefer explicit user invocation such as `$task-clarifier`, `$task-forest`, `$session-handoff-prompt`, or `$user-profile-keeper`.
 - If no skill clearly applies, continue normally; do not force a skill.
 
 ## Loading Protocol
@@ -24,12 +24,14 @@ When a skill applies:
 ```text
 Use $task-clarifier to align this task before implementation.
 Use $task-forest to update the task graph for this workspace.
+Use $session-handoff-prompt to create a continuation prompt for a fresh session.
 Use $user-profile-keeper to initialize or update my local profile.
 ```
 
 ## Local Paths
 
 - `task-forest` writes task data under the current workspace: `.agent-workbench/task-forest/`.
+- `session-handoff-prompt` is read-only by default. It may validate local handoffs with real workspace paths or redact shareable handoffs.
 - `user-profile-keeper` writes profile data under the local user home: `.compass-skills/user-profiles/v1/`.
 - Set `COMPASS_USER_PROFILE_HOME` to override the profile directory.
 - Set `COMPASS_AGENT_NAME` to label task-forest changes by agent, for example `codex`, `claude-code`, `opencode`, or `openclaw`.

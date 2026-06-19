@@ -1,12 +1,13 @@
 # Publication Audit
 
-Audit date: 2026-06-15
+Audit date: 2026-06-19
 
 Scope:
 
 - `skills/user-profile-keeper`
 - `skills/task-forest`
 - `skills/task-clarifier`
+- `skills/session-handoff-prompt`
 - root README files, security note, and visual assets
 
 ## Sanitization
@@ -23,17 +24,20 @@ Scope:
 - Added agent-assisted installation prompts that require safety review before copying skills into an agent or harness.
 - Reworked the localized ecosystem DAG SVGs after rendered visual review to avoid text and arrow overlap at README display widths.
 - Reviewed and linked the static `skill-writing-tutorial.html`; removed a local-materials footer reference and kept only public source links.
+- Added `session-handoff-prompt` as a portable, read-only continuation-prompt skill. It uses English internal instructions, user-language output, explicit `local` and `shareable` privacy modes, and task-forest exports as read-only structured context.
+- Reworked README narratives from three skills to four integrated workflows: user profile, task forest, session handoff, and task clarification.
 
 ## Local-First Boundaries
 
 - `user-profile-keeper` writes only to local profile storage.
 - `task-forest` writes only to the current workspace's `.agent-workbench/task-forest/` directory and an optional lightweight local registry.
 - `task-clarifier` is instruction-only and does not persist data.
+- `session-handoff-prompt` is read-only by default. It validates local handoffs with workspace paths and redacts shareable handoffs before external use.
 - No released skill uploads profile data, task data, credentials, cookies, or browser sessions.
 
 ## Validation Run
 
-Commands run from the package parent:
+Original package validation used:
 
 ```bash
 python3 <skill-creator-dir>/scripts/quick_validate.py compass-skills/skills/task-forest
@@ -46,11 +50,24 @@ COMPASS_USER_PROFILE_HOME=<temp>/profile python3 compass-skills/skills/user-prof
 COMPASS_USER_PROFILE_HOME=<temp>/profile python3 compass-skills/skills/user-profile-keeper/scripts/smoke_test_onboarding.py
 ```
 
+Commands run for the `session-handoff-prompt` addition from the package root:
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 python3 -m py_compile skills/session-handoff-prompt/scripts/project_session_events.py skills/session-handoff-prompt/scripts/read_task_forest_exports.py skills/session-handoff-prompt/scripts/redact_handoff.py skills/session-handoff-prompt/scripts/validate_handoff_prompt.py skills/session-handoff-prompt/scripts/smoke_test_handoff.py
+PYTHONDONTWRITEBYTECODE=1 python3 skills/session-handoff-prompt/scripts/smoke_test_handoff.py --skill-dir skills/session-handoff-prompt
+python3 <run-history-skill-builder-dir>/scripts/validate_skill_package.py skills/session-handoff-prompt
+python3 <inline>  # no-dependency equivalent of quick_validate.py frontmatter checks because the current Python environment lacks PyYAML
+python3 <inline>  # skills.sh.json and eval JSON parsing
+python3 <inline>  # manifest-to-skill-directory consistency check
+python3 <inline>  # secret/path scan with script-detector false positives allowed
+```
+
 Results:
 
-- Skill validation: passed for all three skills.
+- Skill validation: passed for the previously released three skills; `session-handoff-prompt` passed an equivalent no-dependency frontmatter check and `validate_skill_package.py`.
 - Python compile check: passed.
 - Task-forest clean-room export validation: passed.
+- Session-handoff smoke test: passed, including compacted-event projection, task-forest read-only summaries, local validation, and shareable redaction.
 - User-profile keeper init/read smoke check: passed.
 - Onboarding smoke tests: passed.
 
@@ -61,6 +78,7 @@ Secret/path scans were run across Markdown, Python, YAML, and SVG files. Remaini
 - `127.0.0.1` in `onboarding_webui.py` and questionnaire docs: local-only Web UI binding.
 - private-key, provider-token, and credential-like patterns in `onboarding_webui.py`: secret redaction detectors, not real secrets.
 - `token` in `task_forest.py`: random local lock token, not a credential.
+- credential-like and local-path patterns in `session-handoff-prompt` scripts: detectors, validators, or synthetic smoke-test strings.
 - `private` / `secret` in docs: privacy boundary terminology.
 
 No personal path, real credential, browser-cookie access, remote publish action, or runtime cache remains in the package.

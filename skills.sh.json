@@ -8,6 +8,7 @@
       "skills": [
         "task-clarifier",
         "task-forest",
+        "session-handoff-prompt",
         "user-profile-keeper"
       ]
     }
