@@ -9,7 +9,7 @@
 >
 > 从使用 `SKILL.md` 到搭建本地 Skill 系统，讲清楚最小结构、渐进披露、复用审计、AI 生成草稿、真实链路提炼和迭代验证。
 
-COMPASS 提供四类本地 skills：用户画像、任务图谱、session 续接和需求对齐。它把长任务、跨 session 协作和多 agent 工作从聊天记录里移到可查、可更新、可续接的本地结构中。
+COMPASS 提供四类本地 skills：用户画像、任务图谱、AI 对话续接和需求对齐。它把长任务、跨 AI 对话协作和多 agent 工作从聊天记录里移到可查、可更新、可续接的本地结构中。
 
 ## 快速理解
 
@@ -23,19 +23,19 @@ COMPASS 提供四类本地 skills：用户画像、任务图谱、session 续接
 3. 用户能确认 agent 的理解没有偏离。
 
 **场景 2：任务进行中和结束后，维护任务树 / 任务森林。**
-用 `$task-forest` 把当前 session 分解成各个任务，并把每个任务的目标、进度、偏差、依赖、待办和决策写成 proposal。确认后生成树视图、DAG 视图、任务详情卡和推荐队列，让下一个 agent 或下一个 session 继续时知道“这件事为什么做、做到哪、下一步做什么”。
+用 `$task-forest` 把当前对话分解成各个任务，并把每个任务的目标、进度、偏差、依赖、待办和决策写成 proposal。确认后生成树视图、DAG 视图、任务详情卡和推荐队列，让下一个 agent 或新 AI 对话继续时知道“这件事为什么做、做到哪、下一步做什么”。
 
-**场景 3：上下文变长时，生成新 session 续接 prompt。**
-用 `$session-handoff-prompt` 把当前 session、显式 transcript、workspace 证据和 `$task-forest` 导出压缩成一段可复制到新 session 的 prompt。它负责让新 agent 知道目标、约束、已确认事实、已完成工作、未完成事项、关键文件和下一步；它只读任务森林，不改任务图。
+**场景 3：上下文变长时，生成新 AI 对话续接 prompt。**
+用 `$session-handoff-prompt` 把当前这轮对话里真正需要延续的目标、进展、约束和下一步，压缩成一段可直接复制给新 AI 对话的提示词，让新对话像接着原来的对话继续做事。它可以结合显式 transcript、workspace 证据和 `$task-forest` 导出；它只读任务森林，不改任务图。
 
 **场景 4：长期协作中，保存本地协作画像。**
 用 `$user-profile-keeper` 在本地保存可审计、可纠错、可撤回的协作画像。画像只记录用户确认或低敏的协作信号；secret、token、密码、私钥和验证码不进入画像。`$task-clarifier` 可读取低敏摘要来调整提问方式；没有画像时，它依然按当前上下文工作。
 
-`$task-forest` 导出的任务关系树和 session 更新流程：
+`$task-forest` 导出的任务关系树和对话更新流程：
 
 ![task-forest tree demo](assets/task-forest-demo.gif)
 
-这个 GIF 展示多个 session 更新后，当前 repo 的任务森林逐步成型。
+这个 GIF 展示多次对话更新后，当前 repo 的任务森林逐步成型。
 
 DAG 关系视图：
 
@@ -56,9 +56,9 @@ DAG 关系视图：
 - **用户信息**：沟通偏好、风险边界、常见遗漏和长期协作方式。
 - **任务全局**：当前动作属于哪个长期目标、依赖什么、推进到哪里。
 - **目标关系**：当前任务和原始目的之间的贡献关系，以及是否出现偏移。
-- **续接上下文**：新 session 需要知道什么，才能不重放完整聊天记录也能继续推进。
+- **续接上下文**：新 AI 对话需要知道什么，才能不重放完整聊天记录也能继续推进。
 
-COMPASS 提供一套长期协作流程：先读取用户协作画像，再查看任务森林，需要换 session 时生成续接 prompt，最后在行动前完成目标对齐。
+COMPASS 提供一套长期协作流程：先读取用户协作画像，再查看任务森林，需要换 AI 对话时生成续接 prompt，最后在行动前完成目标对齐。
 
 ## 四层模型
 
@@ -66,7 +66,7 @@ COMPASS 提供一套长期协作流程：先读取用户协作画像，再查看
 | --- | --- | --- |
 | **知人** | [`$user-profile-keeper`](skills/user-profile-keeper/) | 本地维护可审计、可纠错、可撤回的用户画像，让 agent 了解用户偏好、风险确认方式和协作边界。 |
 | **知事** | [`$task-forest`](skills/task-forest/) | 在 repo 内维护任务森林 / DAG，记录长期目标、子任务、依赖、进度、偏差、todo 和历史快照。 |
-| **知续** | [`$session-handoff-prompt`](skills/session-handoff-prompt/) | 把长 session 压缩成新 session 可直接使用的续接 prompt，保留目标、证据、状态和下一步。 |
+| **知续** | [`$session-handoff-prompt`](skills/session-handoff-prompt/) | 把当前对话里真正需要延续的目标、进展、约束和下一步，压缩成可直接复制给新 AI 对话的提示词。 |
 | **知向** | [`$task-clarifier`](skills/task-clarifier/) | 把模糊需求对齐成三方一致的执行契约：用户想清楚、agent 听准确、用户能确认没跑偏。 |
 
 一句话理解：
@@ -74,7 +74,7 @@ COMPASS 提供一套长期协作流程：先读取用户协作画像，再查看
 ```text
 $user-profile-keeper 让 AI 知道“你是谁、怎么协作”。
 $task-forest 让 AI 知道“任务在哪里、做到哪里、为什么做，以及有没有偏离总的目标”。
-$session-handoff-prompt 让 AI 知道“下一个 session 该带着哪些上下文继续”。
+$session-handoff-prompt 让 AI 知道“新对话怎样像接着原来的对话继续做事”。
 $task-clarifier 让 AI 知道“用户的需求到底是什么”。
 ```
 
@@ -119,10 +119,10 @@ Repo: https://github.com/dongshuyan/compass-skills
 3. 识别当前 agent / harness 的本地 skills 目录和加载规则；如果无法可靠识别，只给安装计划，不要写入。
 4. 只复制 `skills/` 下的 released skill 目录；不要复制 `.git`、运行缓存、用户画像、任务图、原始截图或本地环境文件。
 5. 安装后运行可用的本地验证，例如 Python 编译检查和 `$task-forest` 导出回归；如果某项无法运行，说明原因和剩余风险。
-6. 最后报告安装位置、已安装 skills、安全检查结果、验证结果，以及如何在 session 中调用。
+6. 最后报告安装位置、已安装 skills、安全检查结果、验证结果，以及如何在 AI 对话中调用。
 ```
 
-手动安装时，把 `skills/` 下的四个目录复制到目标 agent 的本地 skills 目录，然后在 session 中点名使用：
+手动安装时，把 `skills/` 下的四个目录复制到目标 agent 的本地 skills 目录，然后在 AI 对话中点名使用：
 
 ```text
 $user-profile-keeper
@@ -152,10 +152,10 @@ $task-clarifier
 4. 完成后告诉我：已写入哪些低敏信息，哪些进入 pending proposal，哪些被跳过。
 ```
 
-**任意 session 更新画像 prompt**
+**任意对话更新画像 prompt**
 
 ```text
-请用 $user-profile-keeper 从当前 session 更新我的本地用户画像。
+请用 $user-profile-keeper 从当前对话更新我的本地用户画像。
 
 请只提取对长期协作有价值的信息，例如沟通偏好、风险确认方式、常见遗漏、能力边界和隐私边界。
 低敏、明确、无冲突的信息可以直接应用；推断性、private、敏感或冲突信息必须进入 proposal 等我确认。
@@ -164,12 +164,12 @@ $task-clarifier
 
 ### $task-forest：任务森林和进度总控
 
-`$task-forest` 在当前 repo 内维护任务森林 / DAG，负责记录长期目标、子任务、依赖、进度、偏差、待办、决策和 session 历史。导出的 HTML 可以离线查看树视图、DAG 视图、历史变化和待复核节点。
+`$task-forest` 在当前 repo 内维护任务森林 / DAG，负责记录长期目标、子任务、依赖、进度、偏差、待办、决策和对话历史。导出的 HTML 可以离线查看树视图、DAG 视图、历史变化和待复核节点。
 
 **构建或更新任务森林 prompt**
 
 ```text
-请用 $task-forest 分析当前 session，并维护当前 workspace 的任务森林。
+请用 $task-forest 分析当前对话，并维护当前 workspace 的任务森林。
 
 目标：把本轮对话中有长期价值的目标、任务、进度、偏差、风险、决策和 follow-up 写成 `$task-forest` proposal。
 要求：
@@ -180,21 +180,21 @@ $task-clarifier
 5. apply 后运行 validate 和 export，并给出 HTML 路径。
 ```
 
-### $session-handoff-prompt：新 session 续接 prompt
+### $session-handoff-prompt：新 AI 对话续接 prompt
 
-`$session-handoff-prompt` 负责把长 session 的关键状态压缩成一段可复制到新 session 的 prompt。它优先使用当前对话、用户明确提供的 transcript 或 log、当前 workspace 证据和 `$task-forest` 导出；默认输出 balanced 模式，也可以生成 minimal 或 full。
+`$session-handoff-prompt` 负责把当前对话里真正需要延续的目标、进展、约束和下一步，压缩成一段可直接复制给新 AI 对话的提示词，让新对话像接着原来的对话继续做事。它优先使用当前对话、用户明确提供的 transcript 或 log、当前 workspace 证据和 `$task-forest` 导出；默认输出 balanced 模式，也可以生成 minimal 或 full。
 
 它有两个隐私模式：
 
-- `privacy=local`：用于同一台机器的新 session，可以保留真实 workspace 路径，方便继续工作。
+- `privacy=local`：用于同一台机器的新 AI 对话，可以保留真实 workspace 路径，方便继续工作。
 - `privacy=shareable`：用于公开分享、issue、外部交接或截图，会脱敏本地路径和 credential-like 字符串。
 
 **生成续接 prompt**
 
 ```text
-请用 $session-handoff-prompt 为当前 session 生成一个 balanced 的新 session 续接 prompt。
+请用 $session-handoff-prompt 为当前对话生成一个 balanced 的新 AI 对话续接 prompt。
 
-目标：让下一个 agent 不需要重放完整 transcript，也能继续当前任务。
+目标：让新 AI 对话不需要重放完整 transcript，也能继续当前任务。
 要求：
 1. 使用当前对话、我明确给出的文件、当前 workspace 证据，以及存在的 task-forest exports。
 2. 只读 task-forest；不要保存 proposal，不要修改任务图。
@@ -206,7 +206,7 @@ $task-clarifier
 **代表性输出形态**
 
 ```text
-你正在接手一个已经进行过多轮的 agent session。请按以下上下文恢复任务状态；如果当前文件或可验证证据与这里冲突，以当前证据为准。
+你正在接手一个已经进行过多轮的 AI 对话。请按以下上下文恢复任务状态；如果当前文件或可验证证据与这里冲突，以当前证据为准。
 
 【工作目录】
 <workspace>
@@ -243,9 +243,9 @@ $task-clarifier
 
 ## 能做什么
 
-- 新 session 结束时，把进度、偏差、决策和待办归入全局任务图。（用户可以自行做成 hook）
-- 上下文变长或需要切换 agent 时，生成可复制续接 prompt，让新 session 带着目标、证据、状态和下一步继续。
-- 当一个新任务找不到父节点或贡献关系时，也就是不知道当前 session 为什么要做时，提醒用户重新确认目标，确保当前 session 符合全局目标、不偏离。
+- 新 AI 对话结束时，把进度、偏差、决策和待办归入全局任务图。（用户可以自行做成 hook）
+- 上下文变长或需要切换 agent 时，生成可复制续接 prompt，让新 AI 对话带着目标、证据、状态和下一步继续。
+- 当一个新任务找不到父节点或贡献关系时，也就是不知道当前对话为什么要做时，提醒用户重新确认目标，确保当前对话符合全局目标、不偏离。
 - 在任务变复杂、变危险、变模糊时，先进入 alignment gate，避免返工和隐私风险。
 - 让用户画像影响“怎么问”，当前上下文始终优先，历史偏好只作为参考。
 - 为后续日报、周报、任务排序、习惯系统、多 agent 总控和 skill 升级提供结构化数据。

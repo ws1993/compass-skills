@@ -10,15 +10,15 @@
 npx skills add dongshuyan/compass-skills --skill '*' -a claude-code
 ```
 
-COMPASS Skills gives AI coding agents four local skills: task clarification, repo-local task memory, session handoff prompts, and a local collaboration profile.
+COMPASS Skills gives AI coding agents four local skills: task clarification, repo-local task memory, AI conversation handoff prompts, and a local collaboration profile.
 
 The project currently ships four `SKILL.md` skills:
 
 | Skill | Purpose |
 | --- | --- |
 | [`task-clarifier`](skills/task-clarifier/) | Aligns goals, scope, evidence, acceptance criteria, and risk boundaries before ambiguous, costly, or externally visible work. |
-| [`task-forest`](skills/task-forest/) | Maintains a repo-local task forest / DAG with goals, subtasks, dependencies, progress, deviations, todos, decisions, and session history. |
-| [`session-handoff-prompt`](skills/session-handoff-prompt/) | Creates a paste-ready continuation prompt so a fresh agent session can resume long-running work with verified state and clear next actions. |
+| [`task-forest`](skills/task-forest/) | Maintains a repo-local task forest / DAG with goals, subtasks, dependencies, progress, deviations, todos, decisions, and conversation history. |
+| [`session-handoff-prompt`](skills/session-handoff-prompt/) | Compresses the current AI conversation's goal, progress, constraints, and next steps into a paste-ready prompt for a new AI conversation. |
 | [`user-profile-keeper`](skills/user-profile-keeper/) | Maintains a local, auditable, correctable collaboration profile for communication preferences, risk style, and recurring working context. |
 
 ## Quick Start
@@ -41,7 +41,7 @@ Install all skills for both Codex and Claude Code:
 npx skills add dongshuyan/compass-skills --skill '*' -a codex -a claude-code
 ```
 
-After installation, invoke the skills directly in a session:
+After installation, invoke the skills directly in an AI conversation:
 
 ```text
 $task-clarifier
@@ -59,13 +59,13 @@ Long-running agent work needs four kinds of state:
 - User context: communication preferences, risk boundaries, recurring omissions, and collaboration style.
 - Project context: where the current request fits, what it depends on, and how far it has progressed.
 - Goal context: how the current task contributes to the original objective and whether it still matches it.
-- Handoff context: what a fresh session needs to resume the current task without replaying the whole transcript.
+- Handoff context: what a new AI conversation needs to continue the current task without replaying the whole transcript.
 
 COMPASS organizes that state into four local workflows:
 
 1. A local profile that the user can inspect and correct.
-2. A repo-local task graph that survives session boundaries.
-3. A paste-ready continuation prompt for fresh sessions.
+2. A repo-local task graph that survives AI conversation boundaries.
+3. A paste-ready continuation prompt for a new AI conversation.
 4. A clarification gate before ambiguous or risky execution.
 
 ## How The Four Skills Work Together
@@ -74,14 +74,14 @@ COMPASS organizes that state into four local workflows:
 
 `task-forest` records long-running work structure: why a task exists, where it fits, how far it progressed, what changed, and what remains unresolved.
 
-`session-handoff-prompt` turns the current session, explicit transcripts, workspace evidence, and optional task-forest exports into a concise prompt for the next agent session. It reads task-forest as structured context but never modifies it.
+`session-handoff-prompt` turns the current AI conversation, explicit transcripts, workspace evidence, and optional task-forest exports into a concise prompt for the next AI conversation. It reads task-forest as structured context but never modifies it.
 
-`user-profile-keeper` stores collaboration preferences locally. Future sessions use the profile to ask relevant questions and apply the right risk boundary. Current files, logs, and user-provided context remain the authority; secrets stay out of the profile.
+`user-profile-keeper` stores collaboration preferences locally. Future AI conversations use the profile to ask relevant questions and apply the right risk boundary. Current files, logs, and user-provided context remain the authority; secrets stay out of the profile.
 
 ```text
 user-profile-keeper    -> who is the user and how should we collaborate?
 task-forest            -> where does this task fit and is it still aligned?
-session-handoff-prompt -> what should the next session know to continue now?
+session-handoff-prompt -> what should the next AI conversation know to continue now?
 task-clarifier         -> what should the agent do now?
 ```
 
@@ -150,22 +150,22 @@ Output: ask 1-3 key questions with recommended answers first; once the core need
 Maintain the task forest for a workspace:
 
 ```text
-Use $task-forest to analyze the current session and maintain the task forest for this workspace.
+Use $task-forest to analyze the current AI conversation and maintain the task forest for this workspace.
 
-Goal: create a task-forest proposal from long-running goals, tasks, progress, deviations, risks, decisions, and follow-ups in this session.
+Goal: create a task-forest proposal from long-running goals, tasks, progress, deviations, risks, decisions, and follow-ups in this AI conversation.
 Requirements:
 1. Read the current task-forest list and todo first; initialize task-forest if missing.
-2. Identify which long-term goal this session served. If no relation is clear, ask me or create a question/risk node.
+2. Identify which long-term goal this AI conversation served. If no relation is clear, ask me or create a question/risk node.
 3. Save a proposal and show me the planned changes before applying.
 4. After approval, apply, validate, export, and report the HTML path.
 ```
 
-Create a continuation prompt for a fresh session:
+Create a continuation prompt for a new AI conversation:
 
 ```text
-Use $session-handoff-prompt to create a balanced continuation prompt for a fresh session.
+Use $session-handoff-prompt to create a balanced continuation prompt for a new AI conversation.
 
-Goal: let the next agent continue the current task without replaying the whole transcript.
+Goal: let the next AI conversation continue the current task without replaying the whole transcript.
 Requirements:
 1. Use the current conversation, explicit files I provide, current workspace evidence, and task-forest exports if present.
 2. Keep task-forest read-only; do not save proposals or modify the task graph.
@@ -177,7 +177,7 @@ Requirements:
 Representative output shape:
 
 ```text
-你正在接手一个已经进行过多轮的 agent session。请按以下上下文恢复任务状态；如果当前文件或可验证证据与这里冲突，以当前证据为准。
+你正在接手一个已经进行过多轮的 AI 对话。请按以下上下文恢复任务状态；如果当前文件或可验证证据与这里冲突，以当前证据为准。
 
 【工作目录】
 <workspace>
