@@ -1,6 +1,20 @@
-# 司南 COMPASS
+<p align="center">
+  <img src="assets/compass-logo.png" alt="COMPASS Skills logo" width="760">
+</p>
 
-[English](README.md)
+<h1 align="center">司南 COMPASS</h1>
+
+<p align="center">
+  <a href="https://github.com/dongshuyan/compass-skills/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/dongshuyan/compass-skills?style=for-the-badge&logo=github"></a>
+  <a href="https://github.com/dongshuyan/compass-skills/forks"><img alt="GitHub forks" src="https://img.shields.io/github/forks/dongshuyan/compass-skills?style=for-the-badge&logo=github"></a>
+  <a href="LICENSE"><img alt="License" src="https://img.shields.io/github/license/dongshuyan/compass-skills?style=for-the-badge"></a>
+  <img alt="Status alpha" src="https://img.shields.io/badge/status-alpha-orange?style=for-the-badge">
+  <a href="https://linux.do/"><img alt="Linux.do" src="https://img.shields.io/badge/Linux.do-open--source-F59E0B?style=for-the-badge"></a>
+</p>
+
+<p align="center">
+  <a href="README.md">English</a>
+</p>
 
 **司南：个性化 AI 任务总控 Skills 系统**  
 **COMPASS: Personal Alignment Skills OS for AI Agents**
