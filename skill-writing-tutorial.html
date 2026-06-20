@@ -348,6 +348,12 @@
       gap: 28px;
       align-items: start;
       padding-bottom: 72px;
+      transition: grid-template-columns 180ms ease, gap 180ms ease;
+    }
+
+    body.nav-collapsed .layout {
+      grid-template-columns: 0 minmax(0, 1fr);
+      gap: 0;
     }
 
     .hero > *,
@@ -362,9 +368,83 @@
 
     .side {
       position: sticky;
-      top: 86px;
+      top: 148px;
       display: grid;
       gap: 14px;
+      max-height: calc(100vh - 166px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding-right: 4px;
+      transition: opacity 180ms ease, transform 180ms ease, visibility 180ms ease;
+      scrollbar-width: thin;
+    }
+
+    body.nav-collapsed .side {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateX(-16px);
+    }
+
+    .nav-toggle {
+      position: fixed;
+      top: 86px;
+      left: max(16px, calc((100vw - 1420px) / 2 + 16px));
+      z-index: 30;
+      min-width: 112px;
+      min-height: 50px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 11px 15px;
+      border: 1px solid rgba(23, 105, 224, 0.35);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--blue);
+      box-shadow: 0 12px 30px rgba(23, 105, 224, 0.16);
+      cursor: pointer;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 850;
+    }
+
+    .nav-toggle:hover,
+    .nav-toggle:focus-visible {
+      border-color: rgba(23, 105, 224, 0.72);
+      background: #eef7ff;
+      outline: none;
+    }
+
+    .nav-toggle-icon {
+      width: 18px;
+      height: 14px;
+      position: relative;
+      flex: 0 0 auto;
+    }
+
+    .nav-toggle-icon::before,
+    .nav-toggle-icon::after,
+    .nav-toggle-icon span {
+      position: absolute;
+      left: 0;
+      width: 18px;
+      height: 2px;
+      border-radius: 999px;
+      background: currentColor;
+      content: "";
+    }
+
+    .nav-toggle-icon::before {
+      top: 0;
+    }
+
+    .nav-toggle-icon span {
+      top: 6px;
+    }
+
+    .nav-toggle-icon::after {
+      bottom: 0;
     }
 
     .side-card,
@@ -454,6 +534,12 @@
       grid-template-columns: minmax(0, 1fr);
       gap: 22px;
       min-width: 0;
+      max-height: calc(100vh - 86px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding-right: 4px;
+      scroll-behavior: smooth;
+      scrollbar-width: thin;
     }
 
     .section-inner {
@@ -1299,7 +1385,7 @@
 
     .repo-skill-grid {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 16px;
     }
 
@@ -1332,6 +1418,11 @@
       color: #8a5614;
     }
 
+    .repo-skill-card:nth-child(4) .repo-skill-kicker {
+      background: var(--rose-2);
+      color: var(--rose);
+    }
+
     .repo-skill-card h3 {
       margin: 0 0 8px;
       color: var(--navy);
@@ -1347,7 +1438,7 @@
 
     .repo-checks {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 12px;
     }
 
@@ -1655,10 +1746,37 @@
 
       .layout {
         grid-template-columns: 1fr;
+        gap: 22px;
       }
 
       .side {
-        position: static;
+        position: fixed;
+        top: 134px;
+        left: 16px;
+        right: 16px;
+        z-index: 28;
+        max-height: calc(100vh - 156px);
+        padding-right: 0;
+      }
+
+      .nav-toggle {
+        top: 76px;
+        left: 16px;
+      }
+
+      body.nav-collapsed .layout {
+        grid-template-columns: 1fr;
+        gap: 22px;
+      }
+
+      body:not(.nav-collapsed) .side {
+        box-shadow: 0 20px 70px rgba(15, 23, 42, 0.22);
+      }
+
+      main {
+        max-height: none;
+        overflow-y: visible;
+        padding-right: 0;
       }
 
       .side-nav {
@@ -1735,6 +1853,11 @@
         gap: 22px;
       }
 
+      .nav-toggle {
+        min-width: 104px;
+        min-height: 48px;
+      }
+
       .grid-two,
       .grid-three,
       .grid-four,
@@ -1784,7 +1907,8 @@
 
     @media print {
       .topbar,
-      .side {
+      .side,
+      .nav-toggle {
         display: none;
       }
 
@@ -1836,6 +1960,11 @@
     </div>
   </header>
 
+  <button class="nav-toggle" id="navToggle" type="button" aria-expanded="true" aria-controls="learningPathPanel" aria-label="收起学习路径" title="收起学习路径">
+    <span class="nav-toggle-icon" aria-hidden="true"><span></span></span>
+    <span class="nav-toggle-text">收起目录</span>
+  </button>
+
   <div id="top" class="page">
     <section class="hero" aria-labelledby="hero-title">
       <div>
@@ -1875,24 +2004,24 @@ description: Use when the user asks to run this recurring workflow.
     </section>
 
     <div class="layout">
-      <aside class="side" aria-label="页面目录">
+      <aside class="side" id="learningPathPanel" aria-label="页面目录">
         <div class="side-card">
           <p class="side-title">学习路径</p>
           <nav class="side-nav">
             <a class="nav-group" href="#skill-basics" data-i18n-en="1. Skill Basics">1. Skill 基本介绍</a>
             <a class="nav-sub" href="#why" data-i18n-en="1.1 Why Skills">1.1 为什么需要</a>
             <a class="nav-sub" href="#minimum" data-i18n-en="1.2 Minimum Model">1.2 最小模型</a>
-            <a class="nav-sub" href="#compare" data-i18n-en="1.3 Concept Boundaries">1.3 概念对比</a>
-            <a class="nav-sub" href="#types" data-i18n-en="1.4 Common Types">1.4 常见类型</a>
+            <a class="nav-sub" href="#anatomy" data-i18n-en="1.3 File Anatomy">1.3 文件构成</a>
+            <a class="nav-sub" href="#disclosure" data-i18n-en="1.4 Loading Model">1.4 加载原理</a>
+            <a class="nav-sub" href="#compare" data-i18n-en="1.5 Concept Boundaries">1.5 概念对比</a>
+            <a class="nav-sub" href="#types" data-i18n-en="1.6 Common Types">1.6 常见类型</a>
             <a class="nav-group" href="#using-skills" data-i18n-en="2. How to Use Skills">2. 如何使用 Skill</a>
-            <a class="nav-sub" href="#discover" data-i18n-en="2.1 Discover and Reuse">2.1 发现复用</a>
+            <a class="nav-sub" href="#discover" data-i18n-en="2.1 Discovery Sources">2.1 发现来源</a>
             <a class="nav-sub" href="#install-intake" data-i18n-en="2.2 Targeted Install">2.2 按需安装</a>
-            <a class="nav-sub" href="#anatomy" data-i18n-en="2.3 File Anatomy">2.3 文件构成</a>
-            <a class="nav-sub" href="#disclosure" data-i18n-en="2.4 Loading Model">2.4 加载原理</a>
-            <a class="nav-sub" href="#compass-repo" data-i18n-en="2.5 COMPASS Install">2.5 COMPASS 安装</a>
+            <a class="nav-sub" href="#compass-repo" data-i18n-en="2.3 COMPASS System">2.3 COMPASS 系统</a>
             <a class="nav-group" href="#building-skills" data-i18n-en="3. How to Build Skills">3. 如何开发 Skill</a>
-            <a class="nav-sub" href="#ai-create" data-i18n-en="3.1 AI Drafting">3.1 AI 生成</a>
-            <a class="nav-sub" href="#distill" data-i18n-en="3.2 Real Workflow">3.2 真实链路</a>
+            <a class="nav-sub" href="#distill" data-i18n-en="3.1 Real Workflow">3.1 真实链路</a>
+            <a class="nav-sub" href="#ai-create" data-i18n-en="3.2 AI Drafting">3.2 AI 生成</a>
             <a class="nav-sub" href="#quality" data-i18n-en="3.3 Quality Gates">3.3 质量门槛</a>
             <a class="nav-sub" href="#routing" data-i18n-en="3.4 Stable Routing">3.4 路由稳定</a>
             <a class="nav-sub" href="#iterate" data-i18n-en="3.5 Iteration">3.5 迭代优化</a>
@@ -1916,7 +2045,7 @@ description: Use when the user asks to run this recurring workflow.
             <div class="section-head">
               <span class="section-number">1</span>
               <h2 data-i18n-en="Skill Basics">Skill 基本介绍</h2>
-              <p data-i18n-en="First build shared vocabulary: what problem skills solve, their minimal structure, and how they differ from prompts, tools, MCP, and subagents.">先建立共同语言：Skill 解决什么问题，最小结构是什么，它和 prompt、tool、MCP、subagent 的边界在哪里。</p>
+              <p data-i18n-en="First build shared vocabulary: what problem skills solve, their minimal structure, file anatomy, loading model, and how they differ from prompts, tools, MCP, and subagents.">先建立共同语言：Skill 解决什么问题，最小结构是什么，文件如何构成，加载原理是什么，它和 prompt、tool、MCP、subagent 的边界在哪里。</p>
             </div>
           </div>
         </section>
@@ -2042,244 +2171,10 @@ requested number of sides.</code></pre>
           </div>
         </section>
 
-        <section id="compare" class="section">
-          <div class="section-inner">
-            <div class="section-head">
-              <span class="section-number">1.3</span>
-              <h2>Skill 和 Prompt、Tool、MCP、Subagent 的区别</h2>
-              <p>这些概念经常被混在一起。最简单的判断：skill 是“如何完成一类任务”的可复用知识和流程，tool/MCP 是“能调用什么”，subagent 是“谁来做”。</p>
-            </div>
-
-            <div class="matrix" role="table" aria-label="概念对比表">
-              <div class="head">概念</div>
-              <div class="head">主要用途</div>
-              <div class="head">是否可复用</div>
-              <div class="head">是否携带文件</div>
-              <div class="head">典型例子</div>
-              <div class="rowhead">Prompt</div>
-              <div>一次性指令</div>
-              <div>低，复制粘贴为主</div>
-              <div>否</div>
-              <div>“帮我写一个提交信息”</div>
-              <div class="rowhead">AGENTS.md</div>
-              <div>项目/全局工作契约</div>
-              <div>高，但偏长期规则</div>
-              <div>通常否</div>
-              <div>代码风格、权限、沟通规则</div>
-              <div class="rowhead">Skill</div>
-              <div>任务能力包</div>
-              <div>高，可触发、可迭代</div>
-              <div>是</div>
-              <div>PDF、CI 修复、安全威胁建模</div>
-              <div class="rowhead">Tool / MCP</div>
-              <div>实际外部能力接口</div>
-              <div>高，偏操作能力</div>
-              <div>不负责教学流程</div>
-              <div>GitHub、Playwright、数据库</div>
-              <div class="rowhead">Subagent</div>
-              <div>独立上下文执行者</div>
-              <div>按任务临时使用</div>
-              <div>由任务决定</div>
-              <div>并行调研、独立验证、对抗审查</div>
-            </div>
-
-            <figure class="diagram">
-              <svg viewBox="0 0 1080 390" role="img" aria-labelledby="fig-stack-title">
-                <title id="fig-stack-title">Skill 在 Agent 工作中的位置</title>
-                <rect width="1080" height="390" fill="#ffffff"/>
-                <rect x="70" y="60" width="220" height="250" rx="8" fill="#eef7ff" stroke="#9cc4ea"/>
-                <text class="svg-text" x="112" y="102" font-size="24" font-weight="850">Skill</text>
-                <text class="svg-muted" x="104" y="138" font-size="15">告诉 agent</text>
-                <text class="svg-muted" x="104" y="164" font-size="15">何时、为何、按什么顺序做</text>
-                <text class="svg-mono" x="104" y="212" font-size="14">SKILL.md</text>
-                <text class="svg-mono" x="104" y="240" font-size="14">references/</text>
-                <text class="svg-mono" x="104" y="268" font-size="14">scripts/</text>
-                <rect x="430" y="68" width="220" height="94" rx="8" fill="#f0faf5" stroke="#98cfb7"/>
-                <text class="svg-text" x="468" y="105" font-size="22" font-weight="850">Tools / MCP</text>
-                <text class="svg-muted" x="468" y="132" font-size="15">提供可调用能力</text>
-                <rect x="430" y="210" width="220" height="94" rx="8" fill="#fff7e8" stroke="#e5ba73"/>
-                <text class="svg-text" x="468" y="247" font-size="22" font-weight="850">Subagent</text>
-                <text class="svg-muted" x="468" y="274" font-size="15">提供独立执行上下文</text>
-                <rect x="790" y="112" width="220" height="142" rx="8" fill="#fff0f3" stroke="#df9aad"/>
-                <text class="svg-text" x="840" y="154" font-size="24" font-weight="850">用户任务</text>
-                <text class="svg-muted" x="824" y="190" font-size="15">完成一个具体目标</text>
-                <text class="svg-muted" x="824" y="218" font-size="15">并交付可验证结果</text>
-                <path d="M306 185 H410M660 115 H772M660 257 H772" stroke="#1769e0" stroke-width="3"/>
-              </svg>
-              <figcaption>Skill 教 agent 如何可靠地使用工具，工具负责提供实际能力。</figcaption>
-            </figure>
-          </div>
-        </section>
-
-        <section id="types" class="section">
-          <div class="section-inner">
-            <div class="section-head">
-              <span class="section-number">1.4</span>
-              <h2>常见 Skills 类型</h2>
-              <p>最适合做 skill 的对象是会反复出现、容易出错、带固定验收标准的工作流。</p>
-            </div>
-
-            <div class="grid-three">
-              <div class="mini-card">
-                <span class="tag">文件类</span>
-                <h3>PDF / DOCX / PPTX / XLSX</h3>
-                <p>适合封装工具选择、格式坑、渲染检查和模板复用。</p>
-              </div>
-              <div class="mini-card">
-                <span class="tag">工程类</span>
-                <h3>CI / 安全 / 部署</h3>
-                <p>适合封装日志读取顺序、审批边界、验证命令和停止条件。</p>
-              </div>
-              <div class="mini-card">
-                <span class="tag">研究类</span>
-                <h3>搜索 / 引用 / 证据</h3>
-                <p>适合封装来源优先级、过滤标准、引用格式和不确定性标注。</p>
-              </div>
-              <div class="mini-card">
-                <span class="tag">前端类</span>
-                <h3>设计 / 截图 / 响应式</h3>
-                <p>适合封装 UI 标准、浏览器验证、截图检查和常见布局风险。</p>
-              </div>
-              <div class="mini-card">
-                <span class="tag">团队类</span>
-                <h3>Runbook / 评审 / 文档</h3>
-                <p>适合封装团队偏好、输出格式、角色分工和历史教训。</p>
-              </div>
-              <div class="mini-card">
-                <span class="tag">内容类</span>
-                <h3>日报 / PPT / 长文</h3>
-                <p>适合封装选题、素材整理、风格统一、发布前检查。</p>
-              </div>
-            </div>
-
-            <p class="takeaway">选题原则：高频、易错、有固定资源、有验收标准，四个条件满足得越多，越值得做成 skill。</p>
-          </div>
-        </section>
-
-        <section id="using-skills" class="section group-section">
-          <div class="section-inner">
-            <div class="section-head">
-              <span class="section-number">2</span>
-              <h2 data-i18n-en="How to Use Skills">如何使用 Skill</h2>
-              <p data-i18n-en="Then move into usage: discover reusable sources, choose scope, audit and adapt, then understand file structure, loading behavior, and a real install example.">再进入使用流程：先发现可复用来源，按需选择、审计和定制，再看懂文件结构、加载原理和真实安装示例。</p>
-            </div>
-          </div>
-        </section>
-
-        <section id="discover" class="section">
-          <div class="section-inner">
-            <div class="section-head">
-              <span class="section-number">2.1</span>
-              <h2>先发现和复用高质量 Skills</h2>
-              <p data-i18n-en="You do not have to start from a blank file. A more stable path is to study official skills, first-hand repositories, and well-maintained community examples first. Open-source repositories may contain many skills, so decide which ones you actually need before installing, audit the relevant files, and then choose targeted install, adaptation, or rejection.">不必默认从空白文件开始写。更稳的路径是先看官方 skill、一手仓库和维护良好的社区案例；开源仓库可能包含多个 skills，安装前先确认自己真正需要哪几个，再完整审计相关文件，决定按需安装、定制改造或放弃。</p>
-            </div>
-
-            <figure class="info-figure" aria-labelledby="fig-experience-calibration-title">
-              <div class="info-canvas">
-                <div class="info-heading">
-                  <strong id="fig-experience-calibration-title">把个人经验校准成可教学规则</strong>
-                  <span class="info-badge">经验可用，但必须标注证据级别</span>
-                </div>
-                <div class="grid-four">
-                  <div class="step-card">
-                    <strong>AI 生成草稿</strong>
-                    <span>官方文档支持用 `$skill-creator` 起步；但草稿不等于可用 skill，后面必须审核和验证。</span>
-                  </div>
-                  <div class="step-card">
-                    <strong>复用已有 skill</strong>
-                    <span>官方和一手仓库可作为高置信参考；GitHub star 只能作为发现线索，不能当作质量证明。</span>
-                  </div>
-                  <div class="step-card">
-                    <strong>真实链路提炼</strong>
-                    <span>“把工作过的线程、runbook、测试命令转成 skill”有官方支持；中文 workflow 审核是适合中文团队的实践。</span>
-                  </div>
-                  <div class="step-card">
-                    <strong>迭代但不过拟合</strong>
-                    <span>官方 eval 建议用真实 prompt、trace 和检查项防回归；单个失败不要直接写成狭窄特判。</span>
-                  </div>
-                </div>
-              </div>
-              <figcaption>教程后续会把“经验”写成经过来源校准的推荐流程：能被官方或一手实践支持的强化，缺少标准依据的加限定。</figcaption>
-            </figure>
-          </div>
-        </section>
-
-        <section id="install-intake" class="section">
-          <div class="section-inner">
-            <div class="section-head">
-              <span class="section-number">2.2</span>
-              <h2 data-i18n-en="Targeted Install, Audit, and Local Adaptation">按需安装、审计与本地定制</h2>
-              <p data-i18n-en="Using someone else's skill starts with scope selection. For multi-skill repositories, identify the functions that match your workflow, audit only the relevant files completely, and adapt boundaries before installation when needed.">使用别人提供的 skill，第一步是选清范围。多 skill 仓库先确认哪些功能匹配自己的工作流，再完整审计相关文件；边界不合适时，先改成本地版本再安装。</p>
-            </div>
-            <figure class="info-figure" aria-labelledby="fig-discover-info-title">
-              <div class="info-canvas">
-                <div class="info-heading">
-                  <strong id="fig-discover-info-title" data-i18n-en="How do you decide whether an existing skill or skill collection is worth installing?">如何判断一个已有 skill 或 skill 集合值不值得安装？</strong>
-                  <span class="info-badge">Star 只作线索</span>
-                </div>
-                <div class="info-flow">
-                  <div class="info-panel">
-                    <h3>候选来源</h3>
-                    <div class="criteria-list">
-                      <div class="criterion"><b>1</b><span>官方示例：优先级最高，规范最可信。</span></div>
-                      <div class="criterion"><b>2</b><span>高 star 仓库：说明有人关注，但仍需审查。</span></div>
-                      <div class="criterion"><b>3</b><span>同类任务历史：和你的真实工作流最接近。</span></div>
-                    </div>
-                  </div>
-                  <div class="info-arrow" aria-hidden="true">→</div>
-                  <div class="info-panel">
-                    <h3 data-i18n-en="Choose scope, then audit">选定范围再审计</h3>
-                    <div class="criteria-list">
-                      <div class="criterion"><b>A</b><span data-i18n-en="Select only the skills your real task needs from the descriptions and directory layout; do not treat `*` as the default for multi-skill repos.">按真实任务、description 和目录只选需要的 skills；多 skill 仓库不要把 `*` 当默认选项。</span></div>
-                      <div class="criterion"><b>B</b><span data-i18n-en="Read the target skill's `SKILL.md`, relevant references, scripts, assets, and dependency notes.">完整阅读目标 skill 的 `SKILL.md`、相关 references、scripts、assets 和依赖说明。</span></div>
-                      <div class="criterion"><b>C</b><span data-i18n-en="Check for hardcoded keys, private paths, log uploads, external callbacks, file deletion, global config changes, network access, credential reads, or dangerous automation.">检查硬编码密钥、私有路径、上传日志、外部回传，以及删除文件、改全局配置、联网、读凭据等风险。</span></div>
-                      <div class="criterion"><b>D</b><span data-i18n-en="Verify trigger conditions, stop conditions, examples, and checks; if the boundaries do not fit, adapt before installing.">确认触发条件、停止条件、示例和验证方式没有明显错误；边界不合适就先改再装。</span></div>
-                    </div>
-                  </div>
-                  <div class="info-arrow" aria-hidden="true">→</div>
-                  <div class="info-panel">
-                    <h3>处理结果</h3>
-                    <div class="criteria-list">
-                      <div class="criterion"><b>装</b><span data-i18n-en="Audit passed, task matches, install only the needed skill, then try it in a low-risk environment.">审计通过，任务匹配，只安装需要的 skill，先在低风险环境试用。</span></div>
-                      <div class="criterion"><b>改</b><span data-i18n-en="The structure is useful but the boundaries differ, so remove risky content, narrow the trigger, or replace local rules before installing your own version.">结构好但边界不同，先删除风险内容、收窄触发范围或替换本地规则，再安装自己的版本。</span></div>
-                      <div class="criterion"><b>弃</b><span data-i18n-en="The function does not match, triggers are vague, scripts cannot be audited, or privacy and safety boundaries are unclear.">功能不匹配、触发模糊、脚本不可审、隐私或安全边界不清。</span></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <figcaption data-i18n-en="This diagram breaks discovery into sources, scope selection, pre-install audit, and outcomes: do not install until the scope is clear and the relevant files have been read and audited.">这张图把“找高质量 skill”拆成来源、按需筛选、安装前审计和处理结果：没有选清、读完和审完，不要安装。</figcaption>
-            </figure>
-            <div class="grid-four">
-              <div class="mini-card">
-                <span class="tag">先找</span>
-                <h3>官方和高质量仓库</h3>
-                <p>优先看官方示例、活跃维护的 repo、star 较高且最近仍有更新的 skill 集合。Star 只作线索。</p>
-              </div>
-              <div class="mini-card">
-                <span class="tag">先审</span>
-                <h3 data-i18n-en="Choose scope before auditing">先选范围再审计</h3>
-                <p data-i18n-en="For multi-skill repositories, read descriptions and directories first, keep only the functions needed for the current work, then audit the relevant instructions, scripts, dependencies, network access, and privacy risks.">多 skill 仓库先看 description 和目录，只保留当前工作需要的功能；安装前审计相关说明、脚本、依赖、网络访问和隐私风险。</p>
-              </div>
-              <div class="mini-card">
-                <span class="tag">再试</span>
-                <h3>低风险环境试跑</h3>
-                <p>不要直接上真实项目。先用样例或临时目录试跑，观察是否触发准确、步骤完整、输出稳定。</p>
-              </div>
-              <div class="mini-card">
-                <span class="tag">再改</span>
-                <h3>基于成熟模式定制</h3>
-                <p data-i18n-en="Keep the useful structure, replace business rules, private resources, acceptance criteria, and language preferences, and avoid needless rewrites. Installing the original version unchanged is not required.">保留好结构，替换业务规则、私有资源、验收标准和语言偏好，避免无意义重写；没有必要原封不动安装。</p>
-              </div>
-            </div>
-
-            <p class="takeaway" data-i18n-en="Even reusable skills need scope selection and auditing first. The value of writing or adapting a skill is not only structural reuse; it is also keeping context load, privacy, safety, trigger boundaries, and acceptance criteria inside boundaries you can own.">能复用也要先选清和审计。自己写或改 skill 的价值，不只是复用结构，更是把上下文负担、隐私、安全、触发边界和验收标准控制在自己能负责的范围内。</p>
-          </div>
-        </section>
-
         <section id="anatomy" class="section">
           <div class="section-inner">
             <div class="section-head">
-              <span class="section-number">2.3</span>
+              <span class="section-number">1.3</span>
               <h2>Skill 的构成：四类文件各司其职</h2>
               <p>无论是复用别人的 skill，还是让 AI 生成自己的 skill，都要看懂它的文件结构。把所有信息塞进一个 `SKILL.md` 会污染上下文；好的 skill 会把“每次都要看”和“特定分支才要看”的内容分层。</p>
             </div>
@@ -2348,8 +2243,8 @@ requested number of sides.</code></pre>
         <section id="disclosure" class="section">
           <div class="section-inner">
             <div class="section-head">
-              <span class="section-number">2.4</span>
-              <h2>原理：Progressive Disclosure</h2>
+              <span class="section-number">1.4</span>
+              <h2 data-i18n-en="Loading Model: Progressive Disclosure">加载原理：Progressive Disclosure</h2>
               <p>Skill 的关键设计是渐进披露：先暴露最小索引，任务匹配后再逐层加载，避免一开始把所有资料塞进上下文。</p>
             </div>
 
@@ -2390,16 +2285,244 @@ requested number of sides.</code></pre>
           </div>
         </section>
 
+        <section id="compare" class="section">
+          <div class="section-inner">
+            <div class="section-head">
+              <span class="section-number">1.5</span>
+              <h2>Skill 和 Prompt、Tool、MCP、Subagent 的区别</h2>
+              <p>这些概念经常被混在一起。最简单的判断：skill 是“如何完成一类任务”的可复用知识和流程，tool/MCP 是“能调用什么”，subagent 是“谁来做”。</p>
+            </div>
+
+            <div class="matrix" role="table" aria-label="概念对比表">
+              <div class="head">概念</div>
+              <div class="head">主要用途</div>
+              <div class="head">是否可复用</div>
+              <div class="head">是否携带文件</div>
+              <div class="head">典型例子</div>
+              <div class="rowhead">Prompt</div>
+              <div>一次性指令</div>
+              <div>低，复制粘贴为主</div>
+              <div>否</div>
+              <div>“帮我写一个提交信息”</div>
+              <div class="rowhead">AGENTS.md</div>
+              <div>项目/全局工作契约</div>
+              <div>高，但偏长期规则</div>
+              <div>通常否</div>
+              <div>代码风格、权限、沟通规则</div>
+              <div class="rowhead">Skill</div>
+              <div>任务能力包</div>
+              <div>高，可触发、可迭代</div>
+              <div>是</div>
+              <div>PDF、CI 修复、安全威胁建模</div>
+              <div class="rowhead">Tool / MCP</div>
+              <div>实际外部能力接口</div>
+              <div>高，偏操作能力</div>
+              <div>不负责教学流程</div>
+              <div>GitHub、Playwright、数据库</div>
+              <div class="rowhead">Subagent</div>
+              <div>独立上下文执行者</div>
+              <div>按任务临时使用</div>
+              <div>由任务决定</div>
+              <div>并行调研、独立验证、对抗审查</div>
+            </div>
+
+            <figure class="diagram">
+              <svg viewBox="0 0 1080 390" role="img" aria-labelledby="fig-stack-title">
+                <title id="fig-stack-title">Skill 在 Agent 工作中的位置</title>
+                <rect width="1080" height="390" fill="#ffffff"/>
+                <rect x="70" y="60" width="220" height="250" rx="8" fill="#eef7ff" stroke="#9cc4ea"/>
+                <text class="svg-text" x="112" y="102" font-size="24" font-weight="850">Skill</text>
+                <text class="svg-muted" x="104" y="138" font-size="15">告诉 agent</text>
+                <text class="svg-muted" x="104" y="164" font-size="15">何时、为何、按什么顺序做</text>
+                <text class="svg-mono" x="104" y="212" font-size="14">SKILL.md</text>
+                <text class="svg-mono" x="104" y="240" font-size="14">references/</text>
+                <text class="svg-mono" x="104" y="268" font-size="14">scripts/</text>
+                <rect x="430" y="68" width="220" height="94" rx="8" fill="#f0faf5" stroke="#98cfb7"/>
+                <text class="svg-text" x="468" y="105" font-size="22" font-weight="850">Tools / MCP</text>
+                <text class="svg-muted" x="468" y="132" font-size="15">提供可调用能力</text>
+                <rect x="430" y="210" width="220" height="94" rx="8" fill="#fff7e8" stroke="#e5ba73"/>
+                <text class="svg-text" x="468" y="247" font-size="22" font-weight="850">Subagent</text>
+                <text class="svg-muted" x="468" y="274" font-size="15">提供独立执行上下文</text>
+                <rect x="790" y="112" width="220" height="142" rx="8" fill="#fff0f3" stroke="#df9aad"/>
+                <text class="svg-text" x="840" y="154" font-size="24" font-weight="850">用户任务</text>
+                <text class="svg-muted" x="824" y="190" font-size="15">完成一个具体目标</text>
+                <text class="svg-muted" x="824" y="218" font-size="15">并交付可验证结果</text>
+                <path d="M306 185 H410M660 115 H772M660 257 H772" stroke="#1769e0" stroke-width="3"/>
+              </svg>
+              <figcaption>Skill 教 agent 如何可靠地使用工具，工具负责提供实际能力。</figcaption>
+            </figure>
+          </div>
+        </section>
+
+        <section id="types" class="section">
+          <div class="section-inner">
+            <div class="section-head">
+              <span class="section-number">1.6</span>
+              <h2>常见 Skills 类型</h2>
+              <p>最适合做 skill 的对象是会反复出现、容易出错、带固定验收标准的工作流。</p>
+            </div>
+
+            <div class="grid-three">
+              <div class="mini-card">
+                <span class="tag">文件类</span>
+                <h3>PDF / DOCX / PPTX / XLSX</h3>
+                <p>适合封装工具选择、格式坑、渲染检查和模板复用。</p>
+              </div>
+              <div class="mini-card">
+                <span class="tag">工程类</span>
+                <h3>CI / 安全 / 部署</h3>
+                <p>适合封装日志读取顺序、审批边界、验证命令和停止条件。</p>
+              </div>
+              <div class="mini-card">
+                <span class="tag">研究类</span>
+                <h3>搜索 / 引用 / 证据</h3>
+                <p>适合封装来源优先级、过滤标准、引用格式和不确定性标注。</p>
+              </div>
+              <div class="mini-card">
+                <span class="tag">前端类</span>
+                <h3>设计 / 截图 / 响应式</h3>
+                <p>适合封装 UI 标准、浏览器验证、截图检查和常见布局风险。</p>
+              </div>
+              <div class="mini-card">
+                <span class="tag">团队类</span>
+                <h3>Runbook / 评审 / 文档</h3>
+                <p>适合封装团队偏好、输出格式、角色分工和历史教训。</p>
+              </div>
+              <div class="mini-card">
+                <span class="tag">内容类</span>
+                <h3>日报 / PPT / 长文</h3>
+                <p>适合封装选题、素材整理、风格统一、发布前检查。</p>
+              </div>
+            </div>
+
+            <p class="takeaway">选题原则：高频、易错、有固定资源、有验收标准，四个条件满足得越多，越值得做成 skill。</p>
+          </div>
+        </section>
+
+        <section id="using-skills" class="section group-section">
+          <div class="section-inner">
+            <div class="section-head">
+              <span class="section-number">2</span>
+              <h2 data-i18n-en="How to Use Skills">如何使用 Skill</h2>
+              <p data-i18n-en="Then move into usage: discover reusable sources, choose scope, audit and adapt, then look at a real COMPASS install example.">再进入使用流程：先发现可复用来源，再按需选择、审计和定制，最后看一个真实的 COMPASS 安装示例。</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="discover" class="section">
+          <div class="section-inner">
+            <div class="section-head">
+              <span class="section-number">2.1</span>
+              <h2 data-i18n-en="Discover Reusable Skills from Three Sources">从三个来源发现可复用 Skills</h2>
+              <p data-i18n-en="When you want to use someone else's skill, start by finding candidates from GitHub, Skills.sh, and SkillsMP. Discovery only gives you candidates; installation still depends on scope selection, audit, and local adaptation.">如果要使用别人提供的 skill，先从 GitHub、Skills.sh 和 SkillsMP 这三个来源找到候选。发现只负责提供候选，是否安装还要进入范围选择、审计和本地定制。</p>
+            </div>
+
+            <div class="grid-three">
+              <div class="mini-card">
+                <span class="tag" data-i18n-en="Source 1">来源 1</span>
+                <h3>GitHub</h3>
+                <p data-i18n-en="Good for finding official repositories, first-hand repositories, and community collections. Focus on directory layout, recent updates, issues, README, install method, and each skill's `description`; stars are only discovery signals.">适合找官方仓库、一手仓库和社区集合。重点看目录结构、最近更新、issue、README、安装方式和每个 skill 的 `description`，star 只作为发现线索。</p>
+              </div>
+              <div class="mini-card">
+                <span class="tag" data-i18n-en="Source 2">来源 2</span>
+                <h3><a href="https://www.skills.sh/" target="_blank" rel="noopener noreferrer">Skills.sh</a></h3>
+                <p data-i18n-en="Good for finding installable skills by name, use case, and repository source. Before installing, list which skills the repository contains, then decide whether to install only part of it.">适合按名称、用途和仓库来源发现可安装 skills。安装前先列出仓库包含哪些 skills，再决定是否只安装其中一部分。</p>
+              </div>
+              <div class="mini-card">
+                <span class="tag" data-i18n-en="Source 3">来源 3</span>
+                <h3><a href="https://skillsmp.com/" target="_blank" rel="noopener noreferrer">SkillsMP</a></h3>
+                <p data-i18n-en="Good as a third-party skill catalog. A catalog only solves discovery; before anything enters your local setup, audit the target skill's instructions, scripts, dependencies, and permission boundaries.">适合作为第三方 skill 目录使用。目录只解决发现问题，真正进入本地之前仍要完整审计目标 skill 的说明、脚本、依赖和权限边界。</p>
+              </div>
+            </div>
+
+            <p class="takeaway" data-i18n-en="Use these sources to find candidates, then move to targeted install: choose the exact skill, audit the relevant files, and adapt the local copy when your workflow boundaries differ.">这些来源只负责发现候选，下一步是按需安装：选定具体 skill，审计相关文件；工作流边界不一致时，先改成本地版本。</p>
+          </div>
+        </section>
+
+        <section id="install-intake" class="section">
+          <div class="section-inner">
+            <div class="section-head">
+              <span class="section-number">2.2</span>
+              <h2 data-i18n-en="Targeted Install, Audit, and Local Adaptation">按需安装、审计与本地定制</h2>
+              <p data-i18n-en="Using someone else's skill starts with scope selection. For multi-skill repositories, identify the functions that match your workflow, audit only the relevant files completely, and adapt boundaries before installation when needed.">使用别人提供的 skill，第一步是选清范围。多 skill 仓库先确认哪些功能匹配自己的工作流，再完整审计相关文件；边界不合适时，先改成本地版本再安装。</p>
+            </div>
+            <figure class="info-figure" aria-labelledby="fig-discover-info-title">
+              <div class="info-canvas">
+                <div class="info-heading">
+                  <strong id="fig-discover-info-title" data-i18n-en="How do you decide whether an existing skill or skill collection is worth installing?">如何判断一个已有 skill 或 skill 集合值不值得安装？</strong>
+                  <span class="info-badge">Star 只作线索</span>
+                </div>
+                <div class="info-flow">
+                  <div class="info-panel">
+                    <h3>候选来源</h3>
+                    <div class="criteria-list">
+                      <div class="criterion"><b>1</b><span data-i18n-en="GitHub: find official repositories, first-hand repositories, and community collections.">GitHub：找官方仓库、一手仓库和社区集合。</span></div>
+                      <div class="criterion"><b>2</b><span data-i18n-en="Skills.sh: find installable skills by name, use case, and repository source.">Skills.sh：按名称、用途和仓库来源发现可安装 skills。</span></div>
+                      <div class="criterion"><b>3</b><span data-i18n-en="SkillsMP: use a third-party catalog to discover more candidates.">SkillsMP：作为第三方目录发现更多候选。</span></div>
+                    </div>
+                  </div>
+                  <div class="info-arrow" aria-hidden="true">→</div>
+                  <div class="info-panel">
+                    <h3 data-i18n-en="Choose scope, then audit">选定范围再审计</h3>
+                    <div class="criteria-list">
+                      <div class="criterion"><b>A</b><span data-i18n-en="Select only the skills your real task needs from the descriptions and directory layout; do not treat `*` as the default for multi-skill repos.">按真实任务、description 和目录只选需要的 skills；多 skill 仓库不要把 `*` 当默认选项。</span></div>
+                      <div class="criterion"><b>B</b><span data-i18n-en="Read the target skill's `SKILL.md`, relevant references, scripts, assets, and dependency notes.">完整阅读目标 skill 的 `SKILL.md`、相关 references、scripts、assets 和依赖说明。</span></div>
+                      <div class="criterion"><b>C</b><span data-i18n-en="Check for hardcoded keys, private paths, log uploads, external callbacks, file deletion, global config changes, network access, credential reads, or dangerous automation.">检查硬编码密钥、私有路径、上传日志、外部回传，以及删除文件、改全局配置、联网、读凭据等风险。</span></div>
+                      <div class="criterion"><b>D</b><span data-i18n-en="Verify trigger conditions, stop conditions, examples, and checks; if the boundaries do not fit, adapt before installing.">确认触发条件、停止条件、示例和验证方式没有明显错误；边界不合适就先改再装。</span></div>
+                    </div>
+                  </div>
+                  <div class="info-arrow" aria-hidden="true">→</div>
+                  <div class="info-panel">
+                    <h3>处理结果</h3>
+                    <div class="criteria-list">
+                      <div class="criterion"><b>装</b><span data-i18n-en="Audit passed, task matches, install only the needed skill, then try it in a low-risk environment.">审计通过，任务匹配，只安装需要的 skill，先在低风险环境试用。</span></div>
+                      <div class="criterion"><b>改</b><span data-i18n-en="The structure is useful but the boundaries differ, so remove risky content, narrow the trigger, or replace local rules before installing your own version.">结构好但边界不同，先删除风险内容、收窄触发范围或替换本地规则，再安装自己的版本。</span></div>
+                      <div class="criterion"><b>弃</b><span data-i18n-en="The function does not match, triggers are vague, scripts cannot be audited, or privacy and safety boundaries are unclear.">功能不匹配、触发模糊、脚本不可审、隐私或安全边界不清。</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <figcaption data-i18n-en="This diagram breaks discovery into sources, scope selection, pre-install audit, and outcomes: do not install until the scope is clear and the relevant files have been read and audited.">这张图把“找高质量 skill”拆成来源、按需筛选、安装前审计和处理结果：没有选清、读完和审完，不要安装。</figcaption>
+            </figure>
+            <div class="grid-four">
+              <div class="mini-card">
+                <span class="tag">先找</span>
+                <h3 data-i18n-en="Three Discovery Sources">三个发现来源</h3>
+                <p data-i18n-en="Find candidates from GitHub, Skills.sh, and SkillsMP; prioritize official repositories, first-hand repositories, and skill collections that are still maintained. Stars are only signals.">从 GitHub、Skills.sh 和 SkillsMP 找候选；优先看官方仓库、一手仓库和最近仍维护的 skill 集合。Star 只作线索。</p>
+              </div>
+              <div class="mini-card">
+                <span class="tag">先审</span>
+                <h3 data-i18n-en="Choose scope before auditing">先选范围再审计</h3>
+                <p data-i18n-en="For multi-skill repositories, read descriptions and directories first, keep only the functions needed for the current work, then audit the relevant instructions, scripts, dependencies, network access, and privacy risks.">多 skill 仓库先看 description 和目录，只保留当前工作需要的功能；安装前审计相关说明、脚本、依赖、网络访问和隐私风险。</p>
+              </div>
+              <div class="mini-card">
+                <span class="tag">再试</span>
+                <h3>低风险环境试跑</h3>
+                <p>不要直接上真实项目。先用样例或临时目录试跑，观察是否触发准确、步骤完整、输出稳定。</p>
+              </div>
+              <div class="mini-card">
+                <span class="tag">再改</span>
+                <h3>基于成熟模式定制</h3>
+                <p data-i18n-en="Keep the useful structure, replace business rules, private resources, acceptance criteria, and language preferences, and avoid needless rewrites. Installing the original version unchanged is not required.">保留好结构，替换业务规则、私有资源、验收标准和语言偏好，避免无意义重写；没有必要原封不动安装。</p>
+              </div>
+            </div>
+
+            <p class="takeaway" data-i18n-en="Even reusable skills need scope selection and auditing first. The value of writing or adapting a skill is not only structural reuse; it is also keeping context load, privacy, safety, trigger boundaries, and acceptance criteria inside boundaries you can own.">能复用也要先选清和审计。自己写或改 skill 的价值，不只是复用结构，更是把上下文负担、隐私、安全、触发边界和验收标准控制在自己能负责的范围内。</p>
+          </div>
+        </section>
+
+
+
         <section id="compass-repo" class="section">
           <div class="section-inner">
             <div class="section-head">
-              <span class="section-number">2.5</span>
-              <h2 data-i18n-en="司南 COMPASS Skill OS">司南 COMPASS Skill 系统</h2>
-              <p>COMPASS 提供三类本地 skills：用户画像、任务图谱和需求对齐。它把长任务、跨 session 协作和多 agent 工作从聊天记录里移到可查、可更新的本地结构中。</p>
+              <span class="section-number">2.3</span>
+              <h2 data-i18n-en="COMPASS Skill System">司南 COMPASS Skill 系统</h2>
+              <p data-i18n-en="COMPASS provides four local skills: user profiles, task graphs, AI conversation handoff prompts, and requirement alignment. It moves long-running tasks, cross-session collaboration, and multi-agent work out of chat history into local structures that can be inspected and updated.">COMPASS 提供四类本地 skills：用户画像、任务图谱、AI 对话续接和需求对齐。它把长任务、跨 session 协作和多 agent 工作从聊天记录里移到可查、可更新的本地结构中。</p>
             </div>
 
             <div class="repo-intro">
-              <p class="repo-lead">这三个 skills 互相配合：`$user-profile-keeper` 让 agent 知道“你是谁、怎么协作”，`$task-forest` 让 agent 知道“任务在哪里、做到哪里、为什么做”，`$task-clarifier` 让 agent 在行动前确认“用户的需求到底是什么”。它们都围绕本地文件工作，不上传用户数据，也不读取 credential、浏览器 cookie 或远程会话。</p>
+              <p class="repo-lead" data-i18n-en="These four skills work together: `$user-profile-keeper` tells the agent who you are and how to collaborate; `$task-forest` tells the agent where the task fits, how far it has progressed, and why it exists; `$session-handoff-prompt` turns current task state into a paste-ready continuation prompt; `$task-clarifier` confirms what the user actually needs before action. They work on local files, do not upload user data, and do not read credentials, browser cookies, or remote sessions.">这四个 skills 互相配合：`$user-profile-keeper` 让 agent 知道“你是谁、怎么协作”，`$task-forest` 让 agent 知道“任务在哪里、做到哪里、为什么做”，`$session-handoff-prompt` 把当前任务状态整理成可复制给新 AI 对话的续接提示词，`$task-clarifier` 让 agent 在行动前确认“用户的需求到底是什么”。它们都围绕本地文件工作，不上传用户数据，也不读取 credential、浏览器 cookie 或远程会话。</p>
 
               <p class="repo-source"><span data-i18n-en="GitHub repository:">GitHub 仓库：</span> <a href="https://github.com/dongshuyan/compass-skills" target="_blank" rel="noopener noreferrer">dongshuyan/compass-skills</a></p>
 
@@ -2408,35 +2531,41 @@ requested number of sides.</code></pre>
                 <pre><code>npx skills add dongshuyan/compass-skills --skill '*' -a codex -a claude-code</code></pre>
               </div>
 
-              <p class="repo-source" data-i18n-en="This command installs the three core COMPASS skills. For other multi-skill repositories, list the available skills first, install only the needed ones with `--skill <name>`, and adapt a local copy first when your boundaries differ.">这条命令安装 COMPASS 的三个核心 skills。安装其他多 skill 仓库时，先查看可选 skills，再用 `--skill <name>` 只安装需要的功能；边界不同时，可以先改成本地版本再安装。</p>
+              <p class="repo-source" data-i18n-en="This command installs the four core COMPASS skills. For other multi-skill repositories, list the available skills first, install only the needed ones with `--skill <name>`, and adapt a local copy first when your boundaries differ.">这条命令安装 COMPASS 的四个核心 skills。安装其他多 skill 仓库时，先查看可选 skills，再用 `--skill <name>` 只安装需要的功能；边界不同时，可以先改成本地版本再安装。</p>
 
-              <div class="repo-skill-grid" aria-label="COMPASS 三个核心 skills">
+              <div class="repo-skill-grid" aria-label="COMPASS 四个核心 skills">
                 <article class="repo-skill-card">
-                  <span class="repo-skill-kicker">知向</span>
-                  <h3>$task-clarifier</h3>
-                  <p>当需求模糊、成本高或有安全风险时，把想法整理成可执行需求：目标、范围、证据、验收标准和风险边界都写清楚。它先识别必须由用户决定的关键分叉，可查事实由 agent 自己从材料中补足。</p>
-                </article>
-                <article class="repo-skill-card">
-                  <span class="repo-skill-kicker">知事</span>
-                  <h3>$task-forest</h3>
-                  <p>把当前 session 分解成任务森林 / DAG，并记录每个任务的目标、进度、偏差、依赖、待办和决策。确认 proposal 后生成树视图、DAG 视图、任务详情卡和推荐队列。</p>
-                </article>
-                <article class="repo-skill-card">
-                  <span class="repo-skill-kicker">知人</span>
+                  <span class="repo-skill-kicker" data-i18n-en="Profile">知人</span>
                   <h3>$user-profile-keeper</h3>
-                  <p>在本地保存可审计、可纠错、可撤回的协作画像。画像只记录用户确认或低敏的协作信号；secret、token、密码、私钥和验证码不进入画像。</p>
+                  <p data-i18n-en="Stores an auditable, correctable, retractable collaboration profile locally. The profile records only user-confirmed or low-sensitivity collaboration signals; secrets, tokens, passwords, private keys, and verification codes do not enter the profile.">在本地保存可审计、可纠错、可撤回的协作画像。画像只记录用户确认或低敏的协作信号；secret、token、密码、私钥和验证码不进入画像。</p>
+                </article>
+                <article class="repo-skill-card">
+                  <span class="repo-skill-kicker" data-i18n-en="Track">知事</span>
+                  <h3>$task-forest</h3>
+                  <p data-i18n-en="Breaks the current session into a task forest / DAG and records each task's goal, progress, deviation, dependencies, todos, and decisions. After proposal confirmation, it generates a tree view, DAG view, task detail cards, and recommendation queue.">把当前 session 分解成任务森林 / DAG，并记录每个任务的目标、进度、偏差、依赖、待办和决策。确认 proposal 后生成树视图、DAG 视图、任务详情卡和推荐队列。</p>
+                </article>
+                <article class="repo-skill-card">
+                  <span class="repo-skill-kicker" data-i18n-en="Handoff">知续</span>
+                  <h3>$session-handoff-prompt</h3>
+                  <p data-i18n-en="Compresses the goal, progress, constraints, verified facts, risks, and next steps that need to continue into a paste-ready prompt for a new AI conversation. It is for continuity, not full transcript replay, and it does not modify the task graph.">把当前 AI 对话里需要延续的目标、进展、约束、已验证事实、风险和下一步压缩成可直接复制给新 AI 对话的提示词。它面向续接，不回放完整 transcript，也不修改任务图。</p>
+                </article>
+                <article class="repo-skill-card">
+                  <span class="repo-skill-kicker" data-i18n-en="Align">知向</span>
+                  <h3>$task-clarifier</h3>
+                  <p data-i18n-en="When requirements are vague, costly, or risky, it turns an idea into executable requirements: goal, scope, evidence, acceptance criteria, and risk boundaries. It first identifies key branches the user must decide; facts the agent can verify are read from the materials.">当需求模糊、成本高或有安全风险时，把想法整理成可执行需求：目标、范围、证据、验收标准和风险边界都写清楚。它先识别必须由用户决定的关键分叉，可查事实由 agent 自己从材料中补足。</p>
                 </article>
               </div>
 
               <div class="repo-checks" aria-label="需求对齐验收标准">
-                <div class="repo-check">用户能说清自己的目标和约束。</div>
-                <div class="repo-check">agent 能复述可执行的范围和下一步。</div>
-                <div class="repo-check">用户能确认 agent 的理解没有偏离。</div>
+                <div class="repo-check" data-i18n-en="The user can state their goal and constraints clearly.">用户能说清自己的目标和约束。</div>
+                <div class="repo-check" data-i18n-en="The agent knows the task position, progress, and dependencies.">agent 知道任务位置、进度和依赖。</div>
+                <div class="repo-check" data-i18n-en="A new AI conversation can continue the goal, constraints, and next steps.">新 AI 对话能接上目标、约束和下一步。</div>
+                <div class="repo-check" data-i18n-en="The user can confirm that the agent's understanding has not drifted.">用户能确认 agent 的理解没有偏离。</div>
               </div>
 
               <figure class="repo-visual wide">
                 <img src="assets/compass-system-map.zh.svg" data-src-zh="assets/compass-system-map.zh.svg" data-src-en="assets/compass-system-map.en.svg" alt="司南 COMPASS 技能生态 DAG" loading="lazy" decoding="async">
-                <figcaption>三个 skills 的关系：先理解人，再维护事，最后在行动前对齐方向。</figcaption>
+                <figcaption data-i18n-en="How the four skills relate: understand the user, maintain the work, hand off continuity, then align direction before action.">四个 skills 的关系：先理解人，再维护事，再交接续接信息，最后在行动前对齐方向。</figcaption>
               </figure>
 
               <div class="repo-visual-grid" aria-label="COMPASS README 配图">
@@ -2474,82 +2603,48 @@ requested number of sides.</code></pre>
             <div class="section-head">
               <span class="section-number">3</span>
               <h2 data-i18n-en="How to Build Your Own Skill">如何自己开发 Skill</h2>
-              <p data-i18n-en="Finally move into development: draft with AI, distill from real workflows, and use quality gates, routing rules, and iteration to make a skill stable.">最后进入开发流程：用 AI 起草，从真实链路提炼，用质量门槛、路由规则和迭代方法把 skill 变稳定。</p>
+              <p data-i18n-en="Finally move into development: distill from real workflows, draft with AI, and use quality gates, routing rules, and iteration to make a skill stable.">最后进入开发流程：先从真实链路提炼，再用 AI 起草，并用质量门槛、路由规则和迭代方法把 skill 变稳定。</p>
             </div>
           </div>
         </section>
 
-        <section id="ai-create" class="section">
-          <div class="section-inner">
-            <div class="section-head">
-              <span class="section-number">3.1</span>
-              <h2>现代写法：让 AI 生成 Skill 草稿</h2>
-              <p>很多场景下，skill 不必从空白文件手写，可以先用 `skill-creator` 这类 creator skill 生成结构化草稿。注意：AI 生成只解决“起草成本”，不证明 skill 准确、可用或符合要求；人的工作重点是提供真实输入、审核逻辑、控制边界并验证效果。</p>
-            </div>
 
-            <figure class="info-figure" aria-labelledby="fig-ai-create-title">
-              <div class="info-canvas">
-                <div class="info-heading">
-                  <strong id="fig-ai-create-title">用 `skill-creator` 时，人和 AI 分别负责什么？</strong>
-                  <span class="info-badge">可审核地生成</span>
-                </div>
-                <div class="split-figure">
-                  <div class="responsibility-card">
-                    <h3><span class="role-dot"></span>你负责决策</h3>
-                    <ul>
-                      <li>任务边界：什么请求应该触发，什么不该触发。</li>
-                      <li>真实素材：任务记录、输入样例、失败案例、已有脚本。</li>
-                      <li>验收标准：成功输出长什么样，必须验证什么。</li>
-                      <li>风险边界：哪些动作必须先问，哪些不能做。</li>
-                    </ul>
-                    <div class="handoff-row">你给的是“真实工作流和判断标准”。</div>
-                  </div>
-                  <div class="responsibility-card">
-                    <h3><span class="role-dot green"></span>AI 负责生成</h3>
-                    <ul>
-                      <li>把流程整理成 `SKILL.md` 的可执行步骤。</li>
-                      <li>把长资料拆到 `references/`，把重复操作建议脚本化。</li>
-                      <li>生成触发描述、不触发条件、停止条件和输出模板。</li>
-                      <li>根据审核和验证结果持续重写，保留可审查的迭代过程。</li>
-                    </ul>
-                    <div class="handoff-row">AI 产出的是“可审查的 skill 草稿”。</div>
-                  </div>
-                </div>
-              </div>
-              <figcaption>这张图强调职责分工：人给真实边界和验收，AI 做结构化生成，最后仍由人审核和测试逻辑是否成立。</figcaption>
-            </figure>
-
-            <div class="grid-four">
-              <div class="step-card"><strong>1. 给目标</strong><span>说明这个 skill 要解决哪类重复任务，什么时候应该触发，什么时候不应该触发。</span></div>
-              <div class="step-card"><strong>2. 给素材</strong><span>提供真实任务记录、示例输入、输出样例、失败案例、已有脚本或模板。</span></div>
-              <div class="step-card"><strong>3. 让 AI 生成</strong><span>用 `$skill-creator` 或同类 creator skill 生成目录、`SKILL.md`、references、scripts 建议。</span></div>
-              <div class="step-card"><strong>4. 人来审核和验证</strong><span>重点看触发边界、执行顺序、安全停止条件、是否过度宽泛，并用真实 prompt 跑一次。</span></div>
-            </div>
-
-            <div class="code-block" style="margin-top: 20px;">
-              <div class="code-title"><span>推荐请求方式</span><span>给 skill-creator</span></div>
-              <pre><code>$skill-creator
-请根据下面这类真实任务，先提炼 workflow，再生成一个可安装的 skill。
-要求：
-1. 先输出中文 workflow 框架让我审核。
-2. 审核通过后再生成完整 skill 内容。
-3. 如果团队认为更利于模型理解，可把给模型读取的核心说明转成英文。
-4. 无论 skill 内部说明用什么语言，与用户交互和最终输出默认保持中文。
-5. 标出触发条件、不触发条件、安全停止条件和验证方式。
-6. 生成后先用 2-3 个真实 prompt 手工试跑；准备分享前再扩展到 10-20 个测试 prompt。</code></pre>
-            </div>
-
-            <p class="takeaway">AI 生成承担 Markdown 草稿整理；workflow 成立性、验证结果和风险边界由人审核。</p>
-          </div>
-        </section>
 
         <section id="distill" class="section">
           <div class="section-inner">
             <div class="section-head">
-              <span class="section-number">3.2</span>
-              <h2>从真实链路提炼</h2>
+              <span class="section-number">3.1</span>
+              <h2 data-i18n-en="Distill Teachable Rules from Real Workflows">从真实链路提炼可教学规则</h2>
               <p>自己撰写 skill 时，更可靠的素材来自已经跑通过的真实链路：工作过的线程、runbook、测试命令、评审规则、失败修复记录。任务跑通后，再从真实过程里提炼 skill。</p>
             </div>
+
+            <figure class="info-figure" aria-labelledby="fig-experience-calibration-title">
+              <div class="info-canvas">
+                <div class="info-heading">
+                  <strong id="fig-experience-calibration-title">把个人经验校准成可教学规则</strong>
+                  <span class="info-badge">经验可用，但必须标注证据级别</span>
+                </div>
+                <div class="grid-four">
+                  <div class="step-card">
+                    <strong>AI 生成草稿</strong>
+                    <span>官方文档支持用 `$skill-creator` 起步；但草稿不等于可用 skill，后面必须审核和验证。</span>
+                  </div>
+                  <div class="step-card">
+                    <strong>复用已有 skill</strong>
+                    <span>官方和一手仓库可作为高置信参考；GitHub star 只能作为发现线索，不能当作质量证明。</span>
+                  </div>
+                  <div class="step-card">
+                    <strong>真实链路提炼</strong>
+                    <span>“把工作过的线程、runbook、测试命令转成 skill”有官方支持；中文 workflow 审核是适合中文团队的实践。</span>
+                  </div>
+                  <div class="step-card">
+                    <strong>迭代但不过拟合</strong>
+                    <span>官方 eval 建议用真实 prompt、trace 和检查项防回归；单个失败不要直接写成狭窄特判。</span>
+                  </div>
+                </div>
+              </div>
+              <figcaption>教程后续会把“经验”写成经过来源校准的推荐流程：能被官方或一手实践支持的强化，缺少标准依据的加限定。</figcaption>
+            </figure>
 
             <figure class="info-figure" aria-labelledby="fig-distill-info-title">
               <div class="info-canvas">
@@ -2660,6 +2755,70 @@ requested number of sides.</code></pre>
                 </ul>
               </div>
             </div>
+          </div>
+        </section>
+
+        <section id="ai-create" class="section">
+          <div class="section-inner">
+            <div class="section-head">
+              <span class="section-number">3.2</span>
+              <h2>现代写法：让 AI 生成 Skill 草稿</h2>
+              <p>很多场景下，skill 不必从空白文件手写，可以先用 `skill-creator` 这类 creator skill 生成结构化草稿。注意：AI 生成只解决“起草成本”，不证明 skill 准确、可用或符合要求；人的工作重点是提供真实输入、审核逻辑、控制边界并验证效果。</p>
+            </div>
+
+            <figure class="info-figure" aria-labelledby="fig-ai-create-title">
+              <div class="info-canvas">
+                <div class="info-heading">
+                  <strong id="fig-ai-create-title">用 `skill-creator` 时，人和 AI 分别负责什么？</strong>
+                  <span class="info-badge">可审核地生成</span>
+                </div>
+                <div class="split-figure">
+                  <div class="responsibility-card">
+                    <h3><span class="role-dot"></span>你负责决策</h3>
+                    <ul>
+                      <li>任务边界：什么请求应该触发，什么不该触发。</li>
+                      <li>真实素材：任务记录、输入样例、失败案例、已有脚本。</li>
+                      <li>验收标准：成功输出长什么样，必须验证什么。</li>
+                      <li>风险边界：哪些动作必须先问，哪些不能做。</li>
+                    </ul>
+                    <div class="handoff-row">你给的是“真实工作流和判断标准”。</div>
+                  </div>
+                  <div class="responsibility-card">
+                    <h3><span class="role-dot green"></span>AI 负责生成</h3>
+                    <ul>
+                      <li>把流程整理成 `SKILL.md` 的可执行步骤。</li>
+                      <li>把长资料拆到 `references/`，把重复操作建议脚本化。</li>
+                      <li>生成触发描述、不触发条件、停止条件和输出模板。</li>
+                      <li>根据审核和验证结果持续重写，保留可审查的迭代过程。</li>
+                    </ul>
+                    <div class="handoff-row">AI 产出的是“可审查的 skill 草稿”。</div>
+                  </div>
+                </div>
+              </div>
+              <figcaption>这张图强调职责分工：人给真实边界和验收，AI 做结构化生成，最后仍由人审核和测试逻辑是否成立。</figcaption>
+            </figure>
+
+            <div class="grid-four">
+              <div class="step-card"><strong>1. 给目标</strong><span>说明这个 skill 要解决哪类重复任务，什么时候应该触发，什么时候不应该触发。</span></div>
+              <div class="step-card"><strong>2. 给素材</strong><span>提供真实任务记录、示例输入、输出样例、失败案例、已有脚本或模板。</span></div>
+              <div class="step-card"><strong>3. 让 AI 生成</strong><span>用 `$skill-creator` 或同类 creator skill 生成目录、`SKILL.md`、references、scripts 建议。</span></div>
+              <div class="step-card"><strong>4. 人来审核和验证</strong><span>重点看触发边界、执行顺序、安全停止条件、是否过度宽泛，并用真实 prompt 跑一次。</span></div>
+            </div>
+
+            <div class="code-block" style="margin-top: 20px;">
+              <div class="code-title"><span>推荐请求方式</span><span>给 skill-creator</span></div>
+              <pre><code>$skill-creator
+请根据下面这类真实任务，先提炼 workflow，再生成一个可安装的 skill。
+要求：
+1. 先输出中文 workflow 框架让我审核。
+2. 审核通过后再生成完整 skill 内容。
+3. 如果团队认为更利于模型理解，可把给模型读取的核心说明转成英文。
+4. 无论 skill 内部说明用什么语言，与用户交互和最终输出默认保持中文。
+5. 标出触发条件、不触发条件、安全停止条件和验证方式。
+6. 生成后先用 2-3 个真实 prompt 手工试跑；准备分享前再扩展到 10-20 个测试 prompt。</code></pre>
+            </div>
+
+            <p class="takeaway">AI 生成承担 Markdown 草稿整理；workflow 成立性、验证结果和风险边界由人审核。</p>
           </div>
         </section>
 
@@ -3182,6 +3341,8 @@ Trigger tests:
               <a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices">Claude Docs: Skill authoring best practices</a>
               <a href="https://github.com/openai/skills">openai/skills</a>
               <a href="https://github.com/anthropics/skills">anthropics/skills</a>
+              <a href="https://www.skills.sh/">Skills.sh</a>
+              <a href="https://skillsmp.com/">SkillsMP</a>
             </div>
           </div>
         </section>
@@ -3205,8 +3366,10 @@ Trigger tests:
       const enText = JSON.parse(document.getElementById('i18n-en').textContent);
       const toggle = document.getElementById('languageToggle');
       const state = toggle?.querySelector('.lang-state');
+      const navToggle = document.getElementById('navToggle');
+      const navToggleText = navToggle?.querySelector('.nav-toggle-text');
       const originalTitle = document.title;
-      const skipSelector = 'script, style, noscript, pre, code, kbd, samp, .lang-toggle, [data-i18n-en]';
+      const skipSelector = 'script, style, noscript, pre, code, kbd, samp, .lang-toggle, .nav-toggle, [data-i18n-en]';
       const dataTextItems = [];
       const textItems = [];
       const attrItems = [];
@@ -3310,6 +3473,54 @@ Trigger tests:
         });
       };
 
+      const updateNavToggle = (lang) => {
+        if (!navToggle || !navToggleText) return;
+        const collapsed = document.body.classList.contains('nav-collapsed');
+        const label = collapsed
+          ? (lang === 'en' ? 'Show Path' : '展开目录')
+          : (lang === 'en' ? 'Hide Path' : '收起目录');
+        const ariaLabel = collapsed
+          ? (lang === 'en' ? 'Show learning path' : '展开学习路径')
+          : (lang === 'en' ? 'Hide learning path' : '收起学习路径');
+        navToggleText.textContent = label;
+        navToggle.setAttribute('aria-label', ariaLabel);
+        navToggle.setAttribute('title', ariaLabel);
+        navToggle.setAttribute('aria-expanded', String(!collapsed));
+      };
+
+      const setNavCollapsed = (collapsed, lang) => {
+        document.body.classList.toggle('nav-collapsed', collapsed);
+        updateNavToggle(lang);
+      };
+
+      const scrollToHash = (hash) => {
+        if (!hash || hash === '#') return false;
+        const id = decodeURIComponent(hash.slice(1));
+        const target = document.getElementById(id);
+        if (!target) return false;
+        const main = document.querySelector('main');
+        const mainScrollable = main && main.contains(target) && getComputedStyle(main).overflowY !== 'visible';
+        const root = document.documentElement;
+        const previousRootBehavior = root.style.scrollBehavior;
+        const previousMainBehavior = main?.style.scrollBehavior || '';
+        root.style.scrollBehavior = 'auto';
+        if (main) main.style.scrollBehavior = 'auto';
+        if (mainScrollable) {
+          const mainTop = main.getBoundingClientRect().top + window.scrollY - 86;
+          window.scrollTo({ top: mainTop, behavior: 'auto' });
+          const delta = target.getBoundingClientRect().top - main.getBoundingClientRect().top;
+          main.scrollTo({ top: main.scrollTop + delta, behavior: 'auto' });
+        } else {
+          const targetTop = target.getBoundingClientRect().top + window.scrollY - 86;
+          window.scrollTo({ top: targetTop, behavior: 'auto' });
+        }
+        window.requestAnimationFrame(() => {
+          root.style.scrollBehavior = previousRootBehavior;
+          if (main) main.style.scrollBehavior = previousMainBehavior;
+        });
+        return true;
+      };
+
       const applyLanguage = (lang) => {
         dataTextItems.forEach((item) => {
           item.element.textContent = lang === 'en' ? item.translated : item.original;
@@ -3334,14 +3545,33 @@ Trigger tests:
           toggle.setAttribute('title', `Switch language to ${next}`);
           state.textContent = lang === 'en' ? '中' : 'EN';
         }
+        updateNavToggle(lang);
       };
 
       let currentLanguage = 'zh';
+      setNavCollapsed(window.matchMedia('(max-width: 1100px)').matches, currentLanguage);
       applyLanguage(currentLanguage);
       toggle?.addEventListener('click', () => {
         currentLanguage = currentLanguage === 'zh' ? 'en' : 'zh';
         applyLanguage(currentLanguage);
       });
+      navToggle?.addEventListener('click', () => {
+        setNavCollapsed(!document.body.classList.contains('nav-collapsed'), currentLanguage);
+      });
+      document.querySelectorAll('a[href^="#"]').forEach((link) => {
+        link.addEventListener('click', (event) => {
+          const hash = link.getAttribute('href');
+          if (!hash || !scrollToHash(hash)) return;
+          event.preventDefault();
+          history.pushState(null, '', hash);
+          if (link.closest('.side') && window.matchMedia('(max-width: 1100px)').matches) {
+            setNavCollapsed(true, currentLanguage);
+          }
+        });
+      });
+      if (window.location.hash) {
+        window.setTimeout(() => scrollToHash(window.location.hash), 80);
+      }
     })();
   </script>
   <script>
