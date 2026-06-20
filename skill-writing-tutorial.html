@@ -400,6 +400,19 @@
       font-weight: 720;
     }
 
+    .side-nav a.nav-group {
+      margin-top: 6px;
+      background: #f4f8fd;
+      color: var(--navy);
+      font-weight: 900;
+    }
+
+    .side-nav a.nav-sub {
+      padding-left: 18px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
     .side-nav a:hover,
     .side-nav a:focus-visible {
       background: var(--blue-2);
@@ -470,6 +483,14 @@
       color: #ffffff;
       font-size: 18px;
       font-weight: 900;
+    }
+
+    .group-section .section-number {
+      background: var(--blue);
+    }
+
+    .group-section .section-head {
+      margin-bottom: 0;
     }
 
     .section h2 {
@@ -1641,7 +1662,7 @@
       }
 
       .side-nav {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: 1fr;
       }
 
       .grid-four {
@@ -1796,18 +1817,11 @@
       </a>
       <div class="top-actions">
         <nav class="top-links" aria-label="顶部章节导航">
-          <a href="#why">价值</a>
-          <a href="#minimum">最小模型</a>
-          <a href="#discover">发现</a>
-          <a href="#anatomy">构成</a>
-          <a href="#disclosure">原理</a>
-          <a href="#compare">区别</a>
-          <a href="#ai-create">AI 生成</a>
-          <a href="#distill">提炼</a>
-          <a href="#quality">质量</a>
-          <a href="#routing">路由</a>
-          <a href="#iterate">迭代</a>
-          <a href="#practice">练习</a>
+          <a href="#skill-basics" data-i18n-en="Basics">基本介绍</a>
+          <a href="#using-skills" data-i18n-en="Use Skills">使用 Skill</a>
+          <a href="#building-skills" data-i18n-en="Build Skills">开发 Skill</a>
+          <a href="#install-intake" data-i18n-en="Targeted Install">按需安装</a>
+          <a href="#practice" data-i18n-en="Practice">练习</a>
         </nav>
         <button class="lang-toggle" id="languageToggle" type="button" aria-label="Switch language to English" title="Switch language to English">
           <span class="lang-icon" aria-hidden="true"><span>文</span><span>A</span></span>
@@ -1828,7 +1842,7 @@
         <h1 id="hero-title">如何编写 Skills</h1>
         <div class="hero-meta" aria-label="课程信息">
           <span class="pill"><span class="dot"></span>30 分钟主线</span>
-          <span class="pill"><span class="dot" style="background: var(--blue)"></span>12 个递进模块</span>
+          <span class="pill"><span class="dot" style="background: var(--blue)"></span><span data-i18n-en="3 learning goals">3 个学习目标</span></span>
           <span class="pill"><span class="dot" style="background: var(--amber)"></span>6 张重点信息图 + 7 张结构图</span>
         </div>
       </div>
@@ -1865,41 +1879,52 @@ description: Use when the user asks to run this recurring workflow.
         <div class="side-card">
           <p class="side-title">学习路径</p>
           <nav class="side-nav">
-            <a href="#why">0. 为什么需要</a>
-            <a href="#minimum">1. 最小模型</a>
-            <a href="#discover">2. 发现复用</a>
-            <a href="#anatomy">3. 文件构成</a>
-            <a href="#disclosure">4. 加载原理</a>
-            <a href="#compare">5. 概念对比</a>
-            <a href="#ai-create">6. AI 生成</a>
-            <a href="#distill">7. 真实链路</a>
-            <a href="#quality">8. 质量门槛</a>
-            <a href="#routing">9. 路由稳定</a>
-            <a href="#iterate">10. 迭代优化</a>
-            <a href="#types">11. 常见类型</a>
-            <a href="#practice">12. 练习清单</a>
-            <a href="#compass-repo">13. 仓库安装</a>
+            <a class="nav-group" href="#skill-basics" data-i18n-en="1. Skill Basics">1. Skill 基本介绍</a>
+            <a class="nav-sub" href="#why" data-i18n-en="1.1 Why Skills">1.1 为什么需要</a>
+            <a class="nav-sub" href="#minimum" data-i18n-en="1.2 Minimum Model">1.2 最小模型</a>
+            <a class="nav-sub" href="#compare" data-i18n-en="1.3 Concept Boundaries">1.3 概念对比</a>
+            <a class="nav-sub" href="#types" data-i18n-en="1.4 Common Types">1.4 常见类型</a>
+            <a class="nav-group" href="#using-skills" data-i18n-en="2. How to Use Skills">2. 如何使用 Skill</a>
+            <a class="nav-sub" href="#discover" data-i18n-en="2.1 Discover and Reuse">2.1 发现复用</a>
+            <a class="nav-sub" href="#install-intake" data-i18n-en="2.2 Targeted Install">2.2 按需安装</a>
+            <a class="nav-sub" href="#anatomy" data-i18n-en="2.3 File Anatomy">2.3 文件构成</a>
+            <a class="nav-sub" href="#disclosure" data-i18n-en="2.4 Loading Model">2.4 加载原理</a>
+            <a class="nav-sub" href="#compass-repo" data-i18n-en="2.5 COMPASS Install">2.5 COMPASS 安装</a>
+            <a class="nav-group" href="#building-skills" data-i18n-en="3. How to Build Skills">3. 如何开发 Skill</a>
+            <a class="nav-sub" href="#ai-create" data-i18n-en="3.1 AI Drafting">3.1 AI 生成</a>
+            <a class="nav-sub" href="#distill" data-i18n-en="3.2 Real Workflow">3.2 真实链路</a>
+            <a class="nav-sub" href="#quality" data-i18n-en="3.3 Quality Gates">3.3 质量门槛</a>
+            <a class="nav-sub" href="#routing" data-i18n-en="3.4 Stable Routing">3.4 路由稳定</a>
+            <a class="nav-sub" href="#iterate" data-i18n-en="3.5 Iteration">3.5 迭代优化</a>
+            <a class="nav-sub" href="#practice" data-i18n-en="3.6 Practice Checklist">3.6 练习清单</a>
           </nav>
         </div>
         <div class="side-card">
           <p class="side-title">30 分钟分配</p>
           <div class="timebox">
-            <div class="timebox-row"><span>价值</span><span class="bar"><span style="width: 10%"></span></span></div>
-            <div class="timebox-row"><span>发现</span><span class="bar"><span style="width: 24%"></span></span></div>
-            <div class="timebox-row"><span>结构</span><span class="bar"><span style="width: 43%"></span></span></div>
-            <div class="timebox-row"><span>生成</span><span class="bar"><span style="width: 62%"></span></span></div>
-            <div class="timebox-row"><span>路由</span><span class="bar"><span style="width: 74%"></span></span></div>
-            <div class="timebox-row"><span>迭代</span><span class="bar"><span style="width: 88%"></span></span></div>
-            <div class="timebox-row"><span>练习</span><span class="bar"><span style="width: 100%"></span></span></div>
+            <div class="timebox-row"><span data-i18n-en="Basics">入门</span><span class="bar"><span style="width: 22%"></span></span></div>
+            <div class="timebox-row"><span data-i18n-en="Use">使用</span><span class="bar"><span style="width: 52%"></span></span></div>
+            <div class="timebox-row"><span data-i18n-en="Build">开发</span><span class="bar"><span style="width: 86%"></span></span></div>
+            <div class="timebox-row"><span data-i18n-en="Practice">练习</span><span class="bar"><span style="width: 100%"></span></span></div>
           </div>
         </div>
       </aside>
 
       <main>
+        <section id="skill-basics" class="section group-section">
+          <div class="section-inner">
+            <div class="section-head">
+              <span class="section-number">1</span>
+              <h2 data-i18n-en="Skill Basics">Skill 基本介绍</h2>
+              <p data-i18n-en="First build shared vocabulary: what problem skills solve, their minimal structure, and how they differ from prompts, tools, MCP, and subagents.">先建立共同语言：Skill 解决什么问题，最小结构是什么，它和 prompt、tool、MCP、subagent 的边界在哪里。</p>
+            </div>
+          </div>
+        </section>
+
         <section id="why" class="section">
           <div class="section-inner">
             <div class="section-head">
-              <span class="section-number">0</span>
+              <span class="section-number">1.1</span>
               <h2>为什么需要 Skills</h2>
               <p>Skill 解决的是同一类工作每次都要重新解释、重新纠错、重新找资料的问题。当一个工作流反复出现、容易漏步骤、需要固定资源或脚本时，就值得沉淀成 skill。</p>
             </div>
@@ -1965,7 +1990,7 @@ description: Use when the user asks to run this recurring workflow.
         <section id="minimum" class="section">
           <div class="section-inner">
             <div class="section-head">
-              <span class="section-number">1</span>
+              <span class="section-number">1.2</span>
               <h2>Skill 的最小可运行模型</h2>
               <p>最小 skill 只有一个文件夹和一个 `SKILL.md`。`name` 是身份，`description` 是触发入口，正文是触发后才会读取的操作说明。</p>
             </div>
@@ -2017,14 +2042,175 @@ requested number of sides.</code></pre>
           </div>
         </section>
 
-        <section id="discover" class="section">
+        <section id="compare" class="section">
+          <div class="section-inner">
+            <div class="section-head">
+              <span class="section-number">1.3</span>
+              <h2>Skill 和 Prompt、Tool、MCP、Subagent 的区别</h2>
+              <p>这些概念经常被混在一起。最简单的判断：skill 是“如何完成一类任务”的可复用知识和流程，tool/MCP 是“能调用什么”，subagent 是“谁来做”。</p>
+            </div>
+
+            <div class="matrix" role="table" aria-label="概念对比表">
+              <div class="head">概念</div>
+              <div class="head">主要用途</div>
+              <div class="head">是否可复用</div>
+              <div class="head">是否携带文件</div>
+              <div class="head">典型例子</div>
+              <div class="rowhead">Prompt</div>
+              <div>一次性指令</div>
+              <div>低，复制粘贴为主</div>
+              <div>否</div>
+              <div>“帮我写一个提交信息”</div>
+              <div class="rowhead">AGENTS.md</div>
+              <div>项目/全局工作契约</div>
+              <div>高，但偏长期规则</div>
+              <div>通常否</div>
+              <div>代码风格、权限、沟通规则</div>
+              <div class="rowhead">Skill</div>
+              <div>任务能力包</div>
+              <div>高，可触发、可迭代</div>
+              <div>是</div>
+              <div>PDF、CI 修复、安全威胁建模</div>
+              <div class="rowhead">Tool / MCP</div>
+              <div>实际外部能力接口</div>
+              <div>高，偏操作能力</div>
+              <div>不负责教学流程</div>
+              <div>GitHub、Playwright、数据库</div>
+              <div class="rowhead">Subagent</div>
+              <div>独立上下文执行者</div>
+              <div>按任务临时使用</div>
+              <div>由任务决定</div>
+              <div>并行调研、独立验证、对抗审查</div>
+            </div>
+
+            <figure class="diagram">
+              <svg viewBox="0 0 1080 390" role="img" aria-labelledby="fig-stack-title">
+                <title id="fig-stack-title">Skill 在 Agent 工作中的位置</title>
+                <rect width="1080" height="390" fill="#ffffff"/>
+                <rect x="70" y="60" width="220" height="250" rx="8" fill="#eef7ff" stroke="#9cc4ea"/>
+                <text class="svg-text" x="112" y="102" font-size="24" font-weight="850">Skill</text>
+                <text class="svg-muted" x="104" y="138" font-size="15">告诉 agent</text>
+                <text class="svg-muted" x="104" y="164" font-size="15">何时、为何、按什么顺序做</text>
+                <text class="svg-mono" x="104" y="212" font-size="14">SKILL.md</text>
+                <text class="svg-mono" x="104" y="240" font-size="14">references/</text>
+                <text class="svg-mono" x="104" y="268" font-size="14">scripts/</text>
+                <rect x="430" y="68" width="220" height="94" rx="8" fill="#f0faf5" stroke="#98cfb7"/>
+                <text class="svg-text" x="468" y="105" font-size="22" font-weight="850">Tools / MCP</text>
+                <text class="svg-muted" x="468" y="132" font-size="15">提供可调用能力</text>
+                <rect x="430" y="210" width="220" height="94" rx="8" fill="#fff7e8" stroke="#e5ba73"/>
+                <text class="svg-text" x="468" y="247" font-size="22" font-weight="850">Subagent</text>
+                <text class="svg-muted" x="468" y="274" font-size="15">提供独立执行上下文</text>
+                <rect x="790" y="112" width="220" height="142" rx="8" fill="#fff0f3" stroke="#df9aad"/>
+                <text class="svg-text" x="840" y="154" font-size="24" font-weight="850">用户任务</text>
+                <text class="svg-muted" x="824" y="190" font-size="15">完成一个具体目标</text>
+                <text class="svg-muted" x="824" y="218" font-size="15">并交付可验证结果</text>
+                <path d="M306 185 H410M660 115 H772M660 257 H772" stroke="#1769e0" stroke-width="3"/>
+              </svg>
+              <figcaption>Skill 教 agent 如何可靠地使用工具，工具负责提供实际能力。</figcaption>
+            </figure>
+          </div>
+        </section>
+
+        <section id="types" class="section">
+          <div class="section-inner">
+            <div class="section-head">
+              <span class="section-number">1.4</span>
+              <h2>常见 Skills 类型</h2>
+              <p>最适合做 skill 的对象是会反复出现、容易出错、带固定验收标准的工作流。</p>
+            </div>
+
+            <div class="grid-three">
+              <div class="mini-card">
+                <span class="tag">文件类</span>
+                <h3>PDF / DOCX / PPTX / XLSX</h3>
+                <p>适合封装工具选择、格式坑、渲染检查和模板复用。</p>
+              </div>
+              <div class="mini-card">
+                <span class="tag">工程类</span>
+                <h3>CI / 安全 / 部署</h3>
+                <p>适合封装日志读取顺序、审批边界、验证命令和停止条件。</p>
+              </div>
+              <div class="mini-card">
+                <span class="tag">研究类</span>
+                <h3>搜索 / 引用 / 证据</h3>
+                <p>适合封装来源优先级、过滤标准、引用格式和不确定性标注。</p>
+              </div>
+              <div class="mini-card">
+                <span class="tag">前端类</span>
+                <h3>设计 / 截图 / 响应式</h3>
+                <p>适合封装 UI 标准、浏览器验证、截图检查和常见布局风险。</p>
+              </div>
+              <div class="mini-card">
+                <span class="tag">团队类</span>
+                <h3>Runbook / 评审 / 文档</h3>
+                <p>适合封装团队偏好、输出格式、角色分工和历史教训。</p>
+              </div>
+              <div class="mini-card">
+                <span class="tag">内容类</span>
+                <h3>日报 / PPT / 长文</h3>
+                <p>适合封装选题、素材整理、风格统一、发布前检查。</p>
+              </div>
+            </div>
+
+            <p class="takeaway">选题原则：高频、易错、有固定资源、有验收标准，四个条件满足得越多，越值得做成 skill。</p>
+          </div>
+        </section>
+
+        <section id="using-skills" class="section group-section">
           <div class="section-inner">
             <div class="section-head">
               <span class="section-number">2</span>
+              <h2 data-i18n-en="How to Use Skills">如何使用 Skill</h2>
+              <p data-i18n-en="Then move into usage: discover reusable sources, choose scope, audit and adapt, then understand file structure, loading behavior, and a real install example.">再进入使用流程：先发现可复用来源，按需选择、审计和定制，再看懂文件结构、加载原理和真实安装示例。</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="discover" class="section">
+          <div class="section-inner">
+            <div class="section-head">
+              <span class="section-number">2.1</span>
               <h2>先发现和复用高质量 Skills</h2>
               <p data-i18n-en="You do not have to start from a blank file. A more stable path is to study official skills, first-hand repositories, and well-maintained community examples first. Open-source repositories may contain many skills, so decide which ones you actually need before installing, audit the relevant files, and then choose targeted install, adaptation, or rejection.">不必默认从空白文件开始写。更稳的路径是先看官方 skill、一手仓库和维护良好的社区案例；开源仓库可能包含多个 skills，安装前先确认自己真正需要哪几个，再完整审计相关文件，决定按需安装、定制改造或放弃。</p>
             </div>
 
+            <figure class="info-figure" aria-labelledby="fig-experience-calibration-title">
+              <div class="info-canvas">
+                <div class="info-heading">
+                  <strong id="fig-experience-calibration-title">把个人经验校准成可教学规则</strong>
+                  <span class="info-badge">经验可用，但必须标注证据级别</span>
+                </div>
+                <div class="grid-four">
+                  <div class="step-card">
+                    <strong>AI 生成草稿</strong>
+                    <span>官方文档支持用 `$skill-creator` 起步；但草稿不等于可用 skill，后面必须审核和验证。</span>
+                  </div>
+                  <div class="step-card">
+                    <strong>复用已有 skill</strong>
+                    <span>官方和一手仓库可作为高置信参考；GitHub star 只能作为发现线索，不能当作质量证明。</span>
+                  </div>
+                  <div class="step-card">
+                    <strong>真实链路提炼</strong>
+                    <span>“把工作过的线程、runbook、测试命令转成 skill”有官方支持；中文 workflow 审核是适合中文团队的实践。</span>
+                  </div>
+                  <div class="step-card">
+                    <strong>迭代但不过拟合</strong>
+                    <span>官方 eval 建议用真实 prompt、trace 和检查项防回归；单个失败不要直接写成狭窄特判。</span>
+                  </div>
+                </div>
+              </div>
+              <figcaption>教程后续会把“经验”写成经过来源校准的推荐流程：能被官方或一手实践支持的强化，缺少标准依据的加限定。</figcaption>
+            </figure>
+          </div>
+        </section>
+
+        <section id="install-intake" class="section">
+          <div class="section-inner">
+            <div class="section-head">
+              <span class="section-number">2.2</span>
+              <h2 data-i18n-en="Targeted Install, Audit, and Local Adaptation">按需安装、审计与本地定制</h2>
+              <p data-i18n-en="Using someone else's skill starts with scope selection. For multi-skill repositories, identify the functions that match your workflow, audit only the relevant files completely, and adapt boundaries before installation when needed.">使用别人提供的 skill，第一步是选清范围。多 skill 仓库先确认哪些功能匹配自己的工作流，再完整审计相关文件；边界不合适时，先改成本地版本再安装。</p>
+            </div>
             <figure class="info-figure" aria-labelledby="fig-discover-info-title">
               <div class="info-canvas">
                 <div class="info-heading">
@@ -2063,7 +2249,6 @@ requested number of sides.</code></pre>
               </div>
               <figcaption data-i18n-en="This diagram breaks discovery into sources, scope selection, pre-install audit, and outcomes: do not install until the scope is clear and the relevant files have been read and audited.">这张图把“找高质量 skill”拆成来源、按需筛选、安装前审计和处理结果：没有选清、读完和审完，不要安装。</figcaption>
             </figure>
-
             <div class="grid-four">
               <div class="mini-card">
                 <span class="tag">先找</span>
@@ -2088,41 +2273,13 @@ requested number of sides.</code></pre>
             </div>
 
             <p class="takeaway" data-i18n-en="Even reusable skills need scope selection and auditing first. The value of writing or adapting a skill is not only structural reuse; it is also keeping context load, privacy, safety, trigger boundaries, and acceptance criteria inside boundaries you can own.">能复用也要先选清和审计。自己写或改 skill 的价值，不只是复用结构，更是把上下文负担、隐私、安全、触发边界和验收标准控制在自己能负责的范围内。</p>
-
-            <figure class="info-figure" aria-labelledby="fig-experience-calibration-title">
-              <div class="info-canvas">
-                <div class="info-heading">
-                  <strong id="fig-experience-calibration-title">把个人经验校准成可教学规则</strong>
-                  <span class="info-badge">经验可用，但必须标注证据级别</span>
-                </div>
-                <div class="grid-four">
-                  <div class="step-card">
-                    <strong>AI 生成草稿</strong>
-                    <span>官方文档支持用 `$skill-creator` 起步；但草稿不等于可用 skill，后面必须审核和验证。</span>
-                  </div>
-                  <div class="step-card">
-                    <strong>复用已有 skill</strong>
-                    <span>官方和一手仓库可作为高置信参考；GitHub star 只能作为发现线索，不能当作质量证明。</span>
-                  </div>
-                  <div class="step-card">
-                    <strong>真实链路提炼</strong>
-                    <span>“把工作过的线程、runbook、测试命令转成 skill”有官方支持；中文 workflow 审核是适合中文团队的实践。</span>
-                  </div>
-                  <div class="step-card">
-                    <strong>迭代但不过拟合</strong>
-                    <span>官方 eval 建议用真实 prompt、trace 和检查项防回归；单个失败不要直接写成狭窄特判。</span>
-                  </div>
-                </div>
-              </div>
-              <figcaption>教程后续会把“经验”写成经过来源校准的推荐流程：能被官方或一手实践支持的强化，缺少标准依据的加限定。</figcaption>
-            </figure>
           </div>
         </section>
 
         <section id="anatomy" class="section">
           <div class="section-inner">
             <div class="section-head">
-              <span class="section-number">3</span>
+              <span class="section-number">2.3</span>
               <h2>Skill 的构成：四类文件各司其职</h2>
               <p>无论是复用别人的 skill，还是让 AI 生成自己的 skill，都要看懂它的文件结构。把所有信息塞进一个 `SKILL.md` 会污染上下文；好的 skill 会把“每次都要看”和“特定分支才要看”的内容分层。</p>
             </div>
@@ -2191,7 +2348,7 @@ requested number of sides.</code></pre>
         <section id="disclosure" class="section">
           <div class="section-inner">
             <div class="section-head">
-              <span class="section-number">4</span>
+              <span class="section-number">2.4</span>
               <h2>原理：Progressive Disclosure</h2>
               <p>Skill 的关键设计是渐进披露：先暴露最小索引，任务匹配后再逐层加载，避免一开始把所有资料塞进上下文。</p>
             </div>
@@ -2233,79 +2390,99 @@ requested number of sides.</code></pre>
           </div>
         </section>
 
-        <section id="compare" class="section">
+        <section id="compass-repo" class="section">
           <div class="section-inner">
             <div class="section-head">
-              <span class="section-number">5</span>
-              <h2>Skill 和 Prompt、Tool、MCP、Subagent 的区别</h2>
-              <p>这些概念经常被混在一起。最简单的判断：skill 是“如何完成一类任务”的可复用知识和流程，tool/MCP 是“能调用什么”，subagent 是“谁来做”。</p>
+              <span class="section-number">2.5</span>
+              <h2 data-i18n-en="司南 COMPASS Skill OS">司南 COMPASS Skill 系统</h2>
+              <p>COMPASS 提供三类本地 skills：用户画像、任务图谱和需求对齐。它把长任务、跨 session 协作和多 agent 工作从聊天记录里移到可查、可更新的本地结构中。</p>
             </div>
 
-            <div class="matrix" role="table" aria-label="概念对比表">
-              <div class="head">概念</div>
-              <div class="head">主要用途</div>
-              <div class="head">是否可复用</div>
-              <div class="head">是否携带文件</div>
-              <div class="head">典型例子</div>
-              <div class="rowhead">Prompt</div>
-              <div>一次性指令</div>
-              <div>低，复制粘贴为主</div>
-              <div>否</div>
-              <div>“帮我写一个提交信息”</div>
-              <div class="rowhead">AGENTS.md</div>
-              <div>项目/全局工作契约</div>
-              <div>高，但偏长期规则</div>
-              <div>通常否</div>
-              <div>代码风格、权限、沟通规则</div>
-              <div class="rowhead">Skill</div>
-              <div>任务能力包</div>
-              <div>高，可触发、可迭代</div>
-              <div>是</div>
-              <div>PDF、CI 修复、安全威胁建模</div>
-              <div class="rowhead">Tool / MCP</div>
-              <div>实际外部能力接口</div>
-              <div>高，偏操作能力</div>
-              <div>不负责教学流程</div>
-              <div>GitHub、Playwright、数据库</div>
-              <div class="rowhead">Subagent</div>
-              <div>独立上下文执行者</div>
-              <div>按任务临时使用</div>
-              <div>由任务决定</div>
-              <div>并行调研、独立验证、对抗审查</div>
-            </div>
+            <div class="repo-intro">
+              <p class="repo-lead">这三个 skills 互相配合：`$user-profile-keeper` 让 agent 知道“你是谁、怎么协作”，`$task-forest` 让 agent 知道“任务在哪里、做到哪里、为什么做”，`$task-clarifier` 让 agent 在行动前确认“用户的需求到底是什么”。它们都围绕本地文件工作，不上传用户数据，也不读取 credential、浏览器 cookie 或远程会话。</p>
 
-            <figure class="diagram">
-              <svg viewBox="0 0 1080 390" role="img" aria-labelledby="fig-stack-title">
-                <title id="fig-stack-title">Skill 在 Agent 工作中的位置</title>
-                <rect width="1080" height="390" fill="#ffffff"/>
-                <rect x="70" y="60" width="220" height="250" rx="8" fill="#eef7ff" stroke="#9cc4ea"/>
-                <text class="svg-text" x="112" y="102" font-size="24" font-weight="850">Skill</text>
-                <text class="svg-muted" x="104" y="138" font-size="15">告诉 agent</text>
-                <text class="svg-muted" x="104" y="164" font-size="15">何时、为何、按什么顺序做</text>
-                <text class="svg-mono" x="104" y="212" font-size="14">SKILL.md</text>
-                <text class="svg-mono" x="104" y="240" font-size="14">references/</text>
-                <text class="svg-mono" x="104" y="268" font-size="14">scripts/</text>
-                <rect x="430" y="68" width="220" height="94" rx="8" fill="#f0faf5" stroke="#98cfb7"/>
-                <text class="svg-text" x="468" y="105" font-size="22" font-weight="850">Tools / MCP</text>
-                <text class="svg-muted" x="468" y="132" font-size="15">提供可调用能力</text>
-                <rect x="430" y="210" width="220" height="94" rx="8" fill="#fff7e8" stroke="#e5ba73"/>
-                <text class="svg-text" x="468" y="247" font-size="22" font-weight="850">Subagent</text>
-                <text class="svg-muted" x="468" y="274" font-size="15">提供独立执行上下文</text>
-                <rect x="790" y="112" width="220" height="142" rx="8" fill="#fff0f3" stroke="#df9aad"/>
-                <text class="svg-text" x="840" y="154" font-size="24" font-weight="850">用户任务</text>
-                <text class="svg-muted" x="824" y="190" font-size="15">完成一个具体目标</text>
-                <text class="svg-muted" x="824" y="218" font-size="15">并交付可验证结果</text>
-                <path d="M306 185 H410M660 115 H772M660 257 H772" stroke="#1769e0" stroke-width="3"/>
-              </svg>
-              <figcaption>Skill 教 agent 如何可靠地使用工具，工具负责提供实际能力。</figcaption>
-            </figure>
+              <p class="repo-source"><span data-i18n-en="GitHub repository:">GitHub 仓库：</span> <a href="https://github.com/dongshuyan/compass-skills" target="_blank" rel="noopener noreferrer">dongshuyan/compass-skills</a></p>
+
+              <div class="code-block repo-install">
+                <div class="code-title"><span>一键安装</span><span>Codex + Claude Code</span></div>
+                <pre><code>npx skills add dongshuyan/compass-skills --skill '*' -a codex -a claude-code</code></pre>
+              </div>
+
+              <p class="repo-source" data-i18n-en="This command installs the three core COMPASS skills. For other multi-skill repositories, list the available skills first, install only the needed ones with `--skill <name>`, and adapt a local copy first when your boundaries differ.">这条命令安装 COMPASS 的三个核心 skills。安装其他多 skill 仓库时，先查看可选 skills，再用 `--skill <name>` 只安装需要的功能；边界不同时，可以先改成本地版本再安装。</p>
+
+              <div class="repo-skill-grid" aria-label="COMPASS 三个核心 skills">
+                <article class="repo-skill-card">
+                  <span class="repo-skill-kicker">知向</span>
+                  <h3>$task-clarifier</h3>
+                  <p>当需求模糊、成本高或有安全风险时，把想法整理成可执行需求：目标、范围、证据、验收标准和风险边界都写清楚。它先识别必须由用户决定的关键分叉，可查事实由 agent 自己从材料中补足。</p>
+                </article>
+                <article class="repo-skill-card">
+                  <span class="repo-skill-kicker">知事</span>
+                  <h3>$task-forest</h3>
+                  <p>把当前 session 分解成任务森林 / DAG，并记录每个任务的目标、进度、偏差、依赖、待办和决策。确认 proposal 后生成树视图、DAG 视图、任务详情卡和推荐队列。</p>
+                </article>
+                <article class="repo-skill-card">
+                  <span class="repo-skill-kicker">知人</span>
+                  <h3>$user-profile-keeper</h3>
+                  <p>在本地保存可审计、可纠错、可撤回的协作画像。画像只记录用户确认或低敏的协作信号；secret、token、密码、私钥和验证码不进入画像。</p>
+                </article>
+              </div>
+
+              <div class="repo-checks" aria-label="需求对齐验收标准">
+                <div class="repo-check">用户能说清自己的目标和约束。</div>
+                <div class="repo-check">agent 能复述可执行的范围和下一步。</div>
+                <div class="repo-check">用户能确认 agent 的理解没有偏离。</div>
+              </div>
+
+              <figure class="repo-visual wide">
+                <img src="assets/compass-system-map.zh.svg" data-src-zh="assets/compass-system-map.zh.svg" data-src-en="assets/compass-system-map.en.svg" alt="司南 COMPASS 技能生态 DAG" loading="lazy" decoding="async">
+                <figcaption>三个 skills 的关系：先理解人，再维护事，最后在行动前对齐方向。</figcaption>
+              </figure>
+
+              <div class="repo-visual-grid" aria-label="COMPASS README 配图">
+                <figure class="repo-visual">
+                  <button class="repo-zoom-button" type="button">
+                    <img src="assets/task-forest-demo.gif" alt="task-forest 导出的任务关系树和 session 更新流程" loading="lazy" decoding="async">
+                  </button>
+                  <figcaption>`$task-forest` 导出的任务关系树和 session 更新流程。</figcaption>
+                </figure>
+                <figure class="repo-visual">
+                  <button class="repo-zoom-button" type="button">
+                    <img src="assets/task-forest-live-dag.png" alt="task-forest live DAG 关系视图" loading="lazy" decoding="async">
+                  </button>
+                  <figcaption>DAG 关系视图：展示任务、依赖和当前推进位置。</figcaption>
+                </figure>
+                <figure class="repo-visual">
+                  <button class="repo-zoom-button" type="button">
+                    <img src="assets/task-forest-live-detail.png" alt="task-forest 任务详情、目的、要求、证据和调度建议" loading="lazy" decoding="async">
+                  </button>
+                  <figcaption>任务详情、目的、要求、证据和调度建议。</figcaption>
+                </figure>
+                <figure class="repo-visual">
+                  <button class="repo-zoom-button" type="button">
+                    <img src="assets/profile-alignment-flow.zh.png" data-src-zh="assets/profile-alignment-flow.zh.png" data-src-en="assets/profile-alignment-flow.en.png" alt="司南用户画像与需求对齐流程" loading="lazy" decoding="async">
+                  </button>
+                  <figcaption>用户画像与需求对齐的协作方式。</figcaption>
+                </figure>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="building-skills" class="section group-section">
+          <div class="section-inner">
+            <div class="section-head">
+              <span class="section-number">3</span>
+              <h2 data-i18n-en="How to Build Your Own Skill">如何自己开发 Skill</h2>
+              <p data-i18n-en="Finally move into development: draft with AI, distill from real workflows, and use quality gates, routing rules, and iteration to make a skill stable.">最后进入开发流程：用 AI 起草，从真实链路提炼，用质量门槛、路由规则和迭代方法把 skill 变稳定。</p>
+            </div>
           </div>
         </section>
 
         <section id="ai-create" class="section">
           <div class="section-inner">
             <div class="section-head">
-              <span class="section-number">6</span>
+              <span class="section-number">3.1</span>
               <h2>现代写法：让 AI 生成 Skill 草稿</h2>
               <p>很多场景下，skill 不必从空白文件手写，可以先用 `skill-creator` 这类 creator skill 生成结构化草稿。注意：AI 生成只解决“起草成本”，不证明 skill 准确、可用或符合要求；人的工作重点是提供真实输入、审核逻辑、控制边界并验证效果。</p>
             </div>
@@ -2369,7 +2546,7 @@ requested number of sides.</code></pre>
         <section id="distill" class="section">
           <div class="section-inner">
             <div class="section-head">
-              <span class="section-number">7</span>
+              <span class="section-number">3.2</span>
               <h2>从真实链路提炼</h2>
               <p>自己撰写 skill 时，更可靠的素材来自已经跑通过的真实链路：工作过的线程、runbook、测试命令、评审规则、失败修复记录。任务跑通后，再从真实过程里提炼 skill。</p>
             </div>
@@ -2489,7 +2666,7 @@ requested number of sides.</code></pre>
         <section id="quality" class="section">
           <div class="section-inner">
             <div class="section-head">
-              <span class="section-number">8</span>
+              <span class="section-number">3.3</span>
               <h2>稳定 Skill 的质量门槛</h2>
               <p>最符合要求的 skill 是：从真实反复任务中提炼出来，`description` 触发边界准确，`SKILL.md` 保留连续可读的核心流程和少量强路由，长资料放 `references/`，重复易错动作放 `scripts/`，并且用正例、反例、工具验证和 with/without 测试证明它确实让任务更稳定的 skill。</p>
             </div>
@@ -2645,7 +2822,7 @@ requested number of sides.</code></pre>
         <section id="routing" class="section">
           <div class="section-inner">
             <div class="section-head">
-              <span class="section-number">9</span>
+              <span class="section-number">3.4</span>
               <h2>路由要少、强、可验证</h2>
               <p>路由就是让 agent 选择分支。分支本身是正常工程结构，真正的风险来自弱验证和延迟反馈。写 skill 时要减少弱验证分支，把必要分支接到用户确认、脚本、测试、schema、diff 或外部证据。</p>
             </div>
@@ -2725,7 +2902,7 @@ requested number of sides.</code></pre>
         <section id="iterate" class="section">
           <div class="section-inner">
             <div class="section-head">
-              <span class="section-number">10</span>
+              <span class="section-number">3.5</span>
               <h2>使用中迭代：变稳，但不要过拟合</h2>
               <p>Skill 很难一次做到很好。正确做法是多使用、记录偏差、提炼共性，再用真实 prompt 和执行 trace 验证改动；错误做法是每遇到一个孤立失败就加一条很窄的规则。</p>
             </div>
@@ -2798,55 +2975,10 @@ requested number of sides.</code></pre>
           </div>
         </section>
 
-        <section id="types" class="section">
-          <div class="section-inner">
-            <div class="section-head">
-              <span class="section-number">11</span>
-              <h2>常见 Skills 类型</h2>
-              <p>最适合做 skill 的对象是会反复出现、容易出错、带固定验收标准的工作流。</p>
-            </div>
-
-            <div class="grid-three">
-              <div class="mini-card">
-                <span class="tag">文件类</span>
-                <h3>PDF / DOCX / PPTX / XLSX</h3>
-                <p>适合封装工具选择、格式坑、渲染检查和模板复用。</p>
-              </div>
-              <div class="mini-card">
-                <span class="tag">工程类</span>
-                <h3>CI / 安全 / 部署</h3>
-                <p>适合封装日志读取顺序、审批边界、验证命令和停止条件。</p>
-              </div>
-              <div class="mini-card">
-                <span class="tag">研究类</span>
-                <h3>搜索 / 引用 / 证据</h3>
-                <p>适合封装来源优先级、过滤标准、引用格式和不确定性标注。</p>
-              </div>
-              <div class="mini-card">
-                <span class="tag">前端类</span>
-                <h3>设计 / 截图 / 响应式</h3>
-                <p>适合封装 UI 标准、浏览器验证、截图检查和常见布局风险。</p>
-              </div>
-              <div class="mini-card">
-                <span class="tag">团队类</span>
-                <h3>Runbook / 评审 / 文档</h3>
-                <p>适合封装团队偏好、输出格式、角色分工和历史教训。</p>
-              </div>
-              <div class="mini-card">
-                <span class="tag">内容类</span>
-                <h3>日报 / PPT / 长文</h3>
-                <p>适合封装选题、素材整理、风格统一、发布前检查。</p>
-              </div>
-            </div>
-
-            <p class="takeaway">选题原则：高频、易错、有固定资源、有验收标准，四个条件满足得越多，越值得做成 skill。</p>
-          </div>
-        </section>
-
         <section id="practice" class="section">
           <div class="section-inner">
             <div class="section-head">
-              <span class="section-number">12</span>
+              <span class="section-number">3.6</span>
               <h2 data-i18n-en="Exercise: Draft a Minimal Skill with AI">练习：用 AI 起草第一个最小 Skill</h2>
               <p data-i18n-en="This exercise uses commit message drafting because it is small, common, easy to verify, and easy to get subtly wrong. The goal is to practice writing clear trigger scope, evidence sources, side-effect boundaries, output format, and trigger tests.">这个练习用 commit message 起草做样例，因为它小、高频、容易验证，也很容易写偏。目标是练习把触发范围、证据来源、副作用边界、输出格式和触发测试写清楚。</p>
             </div>
@@ -3026,85 +3158,6 @@ Trigger tests:
               </div>
               <figcaption data-i18n-en="Use this checklist to review the draft: trigger scope, evidence source, side effects, output format, and stop conditions must all be explicit.">按这张清单检查草稿：触发范围、证据来源、副作用、输出格式和停止条件都必须明确。</figcaption>
             </figure>
-          </div>
-        </section>
-
-        <section id="compass-repo" class="section">
-          <div class="section-inner">
-            <div class="section-head">
-              <span class="section-number">13</span>
-              <h2 data-i18n-en="司南 COMPASS Skill OS">司南 COMPASS Skill 系统</h2>
-              <p>COMPASS 提供三类本地 skills：用户画像、任务图谱和需求对齐。它把长任务、跨 session 协作和多 agent 工作从聊天记录里移到可查、可更新的本地结构中。</p>
-            </div>
-
-            <div class="repo-intro">
-              <p class="repo-lead">这三个 skills 互相配合：`$user-profile-keeper` 让 agent 知道“你是谁、怎么协作”，`$task-forest` 让 agent 知道“任务在哪里、做到哪里、为什么做”，`$task-clarifier` 让 agent 在行动前确认“用户的需求到底是什么”。它们都围绕本地文件工作，不上传用户数据，也不读取 credential、浏览器 cookie 或远程会话。</p>
-
-              <p class="repo-source"><span data-i18n-en="GitHub repository:">GitHub 仓库：</span> <a href="https://github.com/dongshuyan/compass-skills" target="_blank" rel="noopener noreferrer">dongshuyan/compass-skills</a></p>
-
-              <div class="code-block repo-install">
-                <div class="code-title"><span>一键安装</span><span>Codex + Claude Code</span></div>
-                <pre><code>npx skills add dongshuyan/compass-skills --skill '*' -a codex -a claude-code</code></pre>
-              </div>
-
-              <p class="repo-source" data-i18n-en="This command installs the three core COMPASS skills. For other multi-skill repositories, list the available skills first, install only the needed ones with `--skill <name>`, and adapt a local copy first when your boundaries differ.">这条命令安装 COMPASS 的三个核心 skills。安装其他多 skill 仓库时，先查看可选 skills，再用 `--skill <name>` 只安装需要的功能；边界不同时，可以先改成本地版本再安装。</p>
-
-              <div class="repo-skill-grid" aria-label="COMPASS 三个核心 skills">
-                <article class="repo-skill-card">
-                  <span class="repo-skill-kicker">知向</span>
-                  <h3>$task-clarifier</h3>
-                  <p>当需求模糊、成本高或有安全风险时，把想法整理成可执行需求：目标、范围、证据、验收标准和风险边界都写清楚。它先识别必须由用户决定的关键分叉，可查事实由 agent 自己从材料中补足。</p>
-                </article>
-                <article class="repo-skill-card">
-                  <span class="repo-skill-kicker">知事</span>
-                  <h3>$task-forest</h3>
-                  <p>把当前 session 分解成任务森林 / DAG，并记录每个任务的目标、进度、偏差、依赖、待办和决策。确认 proposal 后生成树视图、DAG 视图、任务详情卡和推荐队列。</p>
-                </article>
-                <article class="repo-skill-card">
-                  <span class="repo-skill-kicker">知人</span>
-                  <h3>$user-profile-keeper</h3>
-                  <p>在本地保存可审计、可纠错、可撤回的协作画像。画像只记录用户确认或低敏的协作信号；secret、token、密码、私钥和验证码不进入画像。</p>
-                </article>
-              </div>
-
-              <div class="repo-checks" aria-label="需求对齐验收标准">
-                <div class="repo-check">用户能说清自己的目标和约束。</div>
-                <div class="repo-check">agent 能复述可执行的范围和下一步。</div>
-                <div class="repo-check">用户能确认 agent 的理解没有偏离。</div>
-              </div>
-
-              <figure class="repo-visual wide">
-                <img src="assets/compass-system-map.zh.svg" data-src-zh="assets/compass-system-map.zh.svg" data-src-en="assets/compass-system-map.en.svg" alt="司南 COMPASS 技能生态 DAG" loading="lazy" decoding="async">
-                <figcaption>三个 skills 的关系：先理解人，再维护事，最后在行动前对齐方向。</figcaption>
-              </figure>
-
-              <div class="repo-visual-grid" aria-label="COMPASS README 配图">
-                <figure class="repo-visual">
-                  <button class="repo-zoom-button" type="button">
-                    <img src="assets/task-forest-demo.gif" alt="task-forest 导出的任务关系树和 session 更新流程" loading="lazy" decoding="async">
-                  </button>
-                  <figcaption>`$task-forest` 导出的任务关系树和 session 更新流程。</figcaption>
-                </figure>
-                <figure class="repo-visual">
-                  <button class="repo-zoom-button" type="button">
-                    <img src="assets/task-forest-live-dag.png" alt="task-forest live DAG 关系视图" loading="lazy" decoding="async">
-                  </button>
-                  <figcaption>DAG 关系视图：展示任务、依赖和当前推进位置。</figcaption>
-                </figure>
-                <figure class="repo-visual">
-                  <button class="repo-zoom-button" type="button">
-                    <img src="assets/task-forest-live-detail.png" alt="task-forest 任务详情、目的、要求、证据和调度建议" loading="lazy" decoding="async">
-                  </button>
-                  <figcaption>任务详情、目的、要求、证据和调度建议。</figcaption>
-                </figure>
-                <figure class="repo-visual">
-                  <button class="repo-zoom-button" type="button">
-                    <img src="assets/profile-alignment-flow.zh.png" data-src-zh="assets/profile-alignment-flow.zh.png" data-src-en="assets/profile-alignment-flow.en.png" alt="司南用户画像与需求对齐流程" loading="lazy" decoding="async">
-                  </button>
-                  <figcaption>用户画像与需求对齐的协作方式。</figcaption>
-                </figure>
-              </div>
-            </div>
           </div>
         </section>
 
