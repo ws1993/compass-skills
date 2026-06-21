@@ -7,7 +7,7 @@ description: Create a concise continuation prompt that a fresh agent session can
 
 ## Language Policy
 
-Write skill instructions in English. When interacting with the user or generating the continuation prompt, use the user's language. Default to Chinese when the user's language is unknown.
+**All output directed at the user — the continuation prompt itself, mode explanations, questions, and confirmations — must be written in the user's language.** Detect the user's language from their message. Default to Chinese when unknown. Skill instructions are written in English; that does not affect the language of user-facing output. The continuation prompt structure uses Chinese section headers (【工作目录】 etc.) regardless of language, because that format is the established contract for new sessions.
 
 ## Role
 

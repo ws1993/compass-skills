@@ -7,7 +7,7 @@ description: Local user-profile maintenance skill for Codex, Claude Code, OpenCl
 
 ## Language Policy
 
-Write skill instructions in English. When interacting with the user or generating profile summaries, proposals, exports, or questions, use the user's language. Default to Chinese when the user's language is unknown.
+**All output directed at the user — profile summaries, proposals, exports, questions, and confirmations — must be written in the user's language.** Detect the user's language from their message. Default to Chinese when unknown. Skill instructions are written in English; that does not affect the language of user-facing output.
 
 ## Role
 
@@ -70,6 +70,39 @@ The main store is managed by `scripts/profile_store.py`:
 - `proposal-list` / `proposal-apply` / `proposal-reject`: review and apply pending updates.
 - `assertion-add` / `correct` / `delete` / `search` / `export`: manual CRUD and export.
 - `validate`: check schema, permissions, WAL mode, orphan evidence, and pending conflicts.
+
+Key usage examples:
+
+```bash
+# Initialize (macOS / Linux)
+python3 <skill-dir>/scripts/profile_store.py init --user default
+# Windows
+py -3 <skill-dir>\scripts\profile_store.py init --user default
+
+# Read low-sensitivity summary for task-clarifier
+python3 <skill-dir>/scripts/profile_store.py read --user default --view clarification_summary
+
+# Submit a self-reported low-sensitivity candidate (auto-apply-safe path)
+python3 <skill-dir>/scripts/profile_store.py update-from-session \
+  --user default \
+  --session-summary "User requires confirmation before high-impact actions." \
+  --candidate-json '[{"category":"risk_boundary","claim":"confirm_high_impact_actions","value":{"summary":"Confirm before delete, overwrite, publish, or install."},"scope":"global","source_type":"self_report","confidence":0.95,"sensitivity":"low","evidence":{"summary":"User explicitly stated this.","context":"current session"}}]' \
+  --auto-apply-safe
+
+# Submit a private background or inferred candidate as proposal
+python3 <skill-dir>/scripts/profile_store.py update-from-session \
+  --user default \
+  --session-summary "User filled background in onboarding." \
+  --candidate-json '[{"category":"education_background","claim":"major_or_specialty","value":{"summary":"User self-reported a field or research direction."},"scope":"global","source_type":"self_report","confidence":0.9,"sensitivity":"private","evidence":{"summary":"Onboarding questionnaire.","context":"local onboarding"}}]' \
+  --propose
+
+# Review and apply proposals
+python3 <skill-dir>/scripts/profile_store.py proposal-list --user default
+python3 <skill-dir>/scripts/profile_store.py proposal-apply --user default --proposal-id <id>
+
+# Start onboarding WebUI
+python3 <skill-dir>/scripts/onboarding_webui.py --user default
+```
 
 Read `references/profile-schema.md` for data structure and JSON input format. Read `references/questionnaire.md` when onboarding is needed.
 
