@@ -1,153 +1,166 @@
 ---
 name: task-clarifier
 description: >-
-  Convergent need-alignment system. Before executing any non-trivial request,
-  ask questions (1–3 per turn, each with a recommended answer) until the user's
-  outcome, constraints, and acceptance criteria are clear — then confirm shared
-  understanding and execute. Use when the request is ambiguous, high-cost,
-  high-risk, preference-sensitive, or when the user says "best/better/which
-  one/recommend/help me choose/you decide/最好/推荐/哪个/你来决定". Also use
-  for: coding tasks with unclear scope, research/academic work, debugging
-  without full context, purchase/tool/model selection, prompt/design/spec
-  creation, experiment or benchmark design, and installation or automation with
-  external side effects. Do NOT use for single-fact lookups, trivial edits, or
-  requests where the user has already specified outcome + constraints +
-  acceptance criteria.
+  Deep need-clarification skill. Activates only on explicit invocation: direct
+  reference to $task-clarifier, or trigger phrases "帮我理清需求" / "需求澄清" /
+  "clarify" / "clarify my needs" / "help me clarify". Once activated, keeps
+  asking until all three goals are met: the user fully understands their own
+  needs, the AI fully understands the user's needs, and the user confirms the
+  AI's understanding is correct. Does not auto-activate; does not intervene in
+  task execution unless explicitly invoked.
 ---
 
 # Task Clarifier
 
-**Language rule:** Always use the user's language. If the user writes Chinese, ask and confirm in Chinese throughout.
+## Language Rule
 
-Your first action on any non-bypass request is to **identify which decisions the user needs to make** — not answer, not search, not execute. User-owned decisions must be asked before external research. Every non-bypass request goes through at least one question.
+**All output directed at the user — questions, options, recommendations, confirmations, summaries — must be written in the user's language.** Detect the user's language from their message. Default to Chinese when unknown. If the user writes Chinese, every word of output must be Chinese. Do not use English in any user-facing output unless the user writes in English.
 
-## Portability
+## Three Goals (all must be met before ending)
 
-This skill is platform-neutral. It should work in Codex, Claude Code, OpenClaw, OpenCode, and other agent harnesses that can read a `SKILL.md` file and its `references/` directory. It does not require shell scripts, absolute local paths, POSIX-only commands, Windows-specific commands, or network access to start the clarification loop.
+1. **Help the user fully understand their own needs** — including dimensions the user has not yet considered, latent contradictions, and implicit assumptions that materially affect the outcome
+2. **Help the AI fully understand the user's needs** — completely, specifically, unambiguously; no unconfirmed dimension is filled with a default value
+3. **Show the user that the AI has fully understood their needs** — present the understanding in an explicitly verifiable form; all inferences listed separately for the user to confirm one by one
 
-When another local skill such as `$user-profile-keeper` is available, use it through the agent's normal skill mechanism. Do not assume a Codex-specific installation path.
+## Startup Reads
 
-## Three Goals
+On activation, silently attempt the following reads. If any source is unavailable, continue without it — do not block the clarification loop.
 
-1. Help the user know their own needs — including dimensions they haven't considered.
-2. Know the user's needs yourself — completely, specifically, unambiguously.
-3. Show the user your understanding so they can confirm or correct it.
+**User profile summary** — If `$user-profile-keeper` is available in the current agent environment, read its `clarification_summary` view (low-sensitivity, need-alignment-related preference data only). Use the agent's normal skill invocation mechanism; do not assume an installation path.
 
-All three must be satisfied before execution begins.
+**Task forest** — If `$task-forest` is available, read the current workspace task list and open todos. Use the agent's normal skill invocation mechanism; do not assume an installation path.
 
-## Execution Loop
+The profile summary enriches the phrasing of question options and recommendations to better match the user's communication style and domain background.  
+The task forest provides context for the global purpose and evolution of the current request, so recommendations align with the real overall goal.  
+The current user message overrides all profile information. Neither source replaces asking about any dimension.  
+Do not read the full profile, pending profile, private background, raw evidence, credentials, cookies, tokens, keys, or unrelated private information. Do not write to the profile or task forest.
 
-```
-[Optional] If `$user-profile-keeper` provides clarification_summary
-  → Use it only as soft context for better questions and recommended answers
-  → Do not run profile scripts directly; if unavailable, continue without profile
-  ↓
-Receive request (or answer to a previous question)
-  ↓
-Scan alignment tree — mark each dimension ✅ ❓ or ➖
-  ↓
-For each ❓: fact or user-owned decision?
-  User-owned decision → keep ❓ — do NOT research before asking
-  Fact → look up now only if it helps phrase the question more precisely
-  ↓
-Any core dimension still ❓?
-  YES → ask 1–3 questions about highest-impact ❓ decisions → wait for reply
-  NO → alignment confirmation → user confirms → [now external research is allowed] → execute
-```
+## Clarification Loop
 
-**External research** (product rankings, prices, specs, benchmarks) happens **after** core decisions are resolved — not before.
+Each round executes the same action:
 
-### Alignment Tree
+From the current conversation and readable context, extract the part that most affects the current outcome. Break it into as few questions as possible — covering what is needed for complete and accurate understanding, as few as possible, at most 3 — and provide a recommended answer and options for each question.
 
-Track these 10 dimensions internally. Do not show the tree — use it to choose what to ask next. See `references/alignment-tree-guide.md` for per-dimension guidance.
+Questions cover whichever of the following still affects the outcome:
 
-**Core (must be resolved before execution):**
+- What the user ultimately wants to achieve
+- Why now, and which global purpose this serves
+- What counts as done and done well
+- What is in scope and what is not
+- Time, budget, technology, format, region, permissions, risks, and external effects
+- Which goal wins when multiple goals conflict
+- Who uses, reviews, or is affected by the result
+- Implicit premises the user has not yet recognized that would change the outcome
+- Contradictions, conflicts between goals and constraints, and parts that are infeasible in practice or technically — highest priority, include in the current round as soon as identified
 
-| # | Dimension | What to resolve |
-|---|-----------|----------------|
-| 1 | Outcome | What result does the user actually want? |
-| 2 | Constraints | Hard limits — budget, time, tech, format, region… |
-| 3 | Acceptance | What counts as success? |
+When a fact can be obtained from local evidence, look it up before asking. User decisions must be confirmed by the user; never substitute a default value for a question.
 
-**Auxiliary (fill with safe defaults + label if unresolved):**
-Audience · Deliverable · Scope · Tradeoffs · Evidence Boundary · Safety/Permission · Non-goals/Stop Condition
+When the user says "up to you / whatever / your call / 你看着办 / 随便 / 你来定", provide a recommended option and ask the user to confirm — do not proceed to execution automatically.
 
-Dimension states: ✅ resolved — ❓ unresolved, important — ➖ not applicable.
+When all three goals are met, enter the confirmation stage. Otherwise keep asking.
 
-### How to Ask
+High-risk actions — including delete, overwrite, migrate, publish, send, deploy, install, use credentials, elevate permissions, write to remote systems, or change global configuration — require listing the exact actions and waiting for explicit approval before execution, even after the confirmation summary is accepted.
 
-**Question count:** Ask 1–3 questions per turn. Batch only when each question is about a completely separate core dimension AND the answer to one would not change what you ask about another. When unsure, ask 1.
+## Question Format
 
-**What to ask first:** Choose the ❓ dimension whose answer most changes the execution path. Upstream dimensions first (if Outcome is unclear, asking about Scope is premature). When the request contains vague quality words ("最好", "optimize", "best"), delegation phrases ("你来定", "随便"), or when context contradicts the request — treat those as signals to prioritize Outcome as the first question, not as a separate route.
-
-**Question format** (adapt to user's language and register):
+Generate questions and recommended answers that are simple, clear, accurate, complete, and understandable to anyone. Output in the user's language (default Chinese):
 
 ```
-我需要确认 [具体变量]，因为 [它如何影响结果]。
-我的建议：[推荐答案]。
-你也可以选：[2–4个选项] / 或者告诉我你的想法。
+[一句话：这个问题为什么影响结果]
+我的建议：[推荐答案，简洁直接]
+A) [选项]　B) [选项]　C) [选项]　D) 告诉我你的想法
 ```
 
-When you have a prior from profile or context: "我 60% 认为你想要 [X]，如果不是，更接近 [A]、[B] 还是 [C]？"
+Draw on the communication preferences and domain familiarity in the profile summary (if read), and the global goal context in the task forest (if read), to make options and recommendations more relevant to this user and this task.
 
-Consult `references/question-bank.md` for domain-specific high-signal questions.
+## Confirmation Stage
 
-### How to Stop
+Once all three goals are met, output in the user's language (default Chinese):
 
-When all 3 core dimensions are ✅:
+```
+我的理解如下：
+[用自然语言陈述用户的完整需求，3-5 行，具体、准确、不遗漏关键约束]
 
-1. Restate your understanding in 2–5 lines of natural language (not a template).
-2. Explicitly label any defaults or profile-sourced assumptions used for auxiliary dimensions.
-3. Ask: "这样理解对吗？有没有我漏掉的？"
-4. User confirms → execute.
-5. User corrects → update, ask at most 1 follow-up question, loop back.
+我的推断（请逐条确认）：
+- 我推断 [X]，因为 [具体原因] — 如有偏差请直接纠正
+- 我推断 [Y]，因为 [具体原因] — 如有偏差请直接纠正
 
-**High-risk operations** (delete, publish, install, credentials, irreversible): even after alignment confirmation, list the exact actions you will take and wait for explicit approval before executing.
+确认后我会：[下一步动作]
+有没有我遗漏的？
+```
 
-### Bypass — The Only Way to Skip Questions
+If the user corrects any inference → update the understanding, ask at most 1 follow-up question on the corrected point, and output the confirmation summary again.  
+If the user confirms everything is correct → this skill ends; execution can begin.
 
-Skip the question loop and execute directly (stating your assumptions) ONLY when:
+## No Bypass After Activation
 
-- User explicitly says: "don't ask" / "just do it" / "go ahead" / "your call" / "直接做" / "不用问" / "你看着办" / "随便".
-- Request is a single-file typo or format fix with the file already specified.
-- Request is a pure factual lookup with zero choices ("Python 3.12 什么时候发布的？").
-- User's request already covers all 3 core dimensions explicitly.
+Once this skill is explicitly invoked, no bypass is used, and no safe defaults substitute for asking. Recommended answers help the user choose quickly; they are not automatically written into the requirements.
 
-**Bypass skips the clarification loop only. It never skips high-risk confirmation.**
+## Examples
 
-**If unsure whether bypass applies, it does not. Ask.**
+### Example 1: Unformed needs + contradiction detection
 
-## Fact vs. Decision Rule
+**User:** `$task-clarifier 帮我写个爬虫，要快，把100万条历史数据全抓完`
 
-Every unresolved dimension is one of two kinds:
+**Round 1 (identify contradiction + highest-impact decision):**
 
-- **Fact** — answerable from code, config, logs, docs, or reliable web sources. Resolve it yourself, mark ✅. Only look up facts when needed to phrase a question more precisely.
-- **Decision** — depends on user preference, priority, risk tolerance, budget, or success criteria. Must ask. No safe default for budget, deadline, region, or priority ranking.
+> "快"和"100万条全部抓完"之间存在冲突：完整抓取百万级数据通常耗时较长，且可能触发目标网站的速率限制或封禁。你更看重哪个？这决定了整体技术策略。  
+> 我的建议：完整性优先，用分批 + 限速策略保证全量，避免封禁。  
+> A) 完整性优先（接受耗时，分批完成）　B) 速度优先（接受部分数据缺失）　C) 有具体 deadline（请告诉我时间）　D) 告诉我你的想法
 
-User-owned decisions always come before external research. Looking up product specs or rankings before the user has stated their budget and use case is wrong even if the information is accurate.
+**User:** `完整性优先，3天内跑完`
 
-See `references/evidence-policy.md` for source tiers and search-before-asking rules.
+**Round 2 (acceptance criteria):**
 
-## User Profile Integration
+> 你如何判断"抓完了"？这决定了数据完整性的验收方式和补抓策略。  
+> 我的建议：以实际抓取条数为主标准，同时记录失败条目以便补抓。  
+> A) 条数达到100万即可　B) 需要与某个基准数据对比验证　C) 告诉我你的想法
 
-If `$user-profile-keeper` is available, use its `clarification_summary` as an optional information source for need alignment.
+**[All three goals met → enter confirmation stage]**
 
-If available, use the profile to:
-- Enrich the information used to choose questions, options, and recommended answers.
-- Phrase questions more precisely (e.g., if the summary says the user often prefers Chinese brands, reflect that as an option or recommendation).
-- Label profile-sourced assumptions in the alignment confirmation so the user can correct stale assumptions.
+---
 
-**Profile rules:**
-- Profile provides priors, not answers. It must not resolve core dimensions by itself; `Outcome`, `Constraints`, and `Acceptance` are resolved only by the current user message, current task context, or explicit user confirmation.
-- Current message always overrides profile. If user says something that contradicts the profile, use what they said now.
-- If `$user-profile-keeper` is unavailable or has no `clarification_summary`, continue without it — never block on profile.
-- Do not read full profiles, private background, pending proposals, or raw evidence from inside `$task-clarifier`.
-- Do not write or update profile data from inside `$task-clarifier`.
-- In alignment confirmation, label profile-sourced assumptions explicitly: "根据历史偏好我假设……"
+### Example 2: Profile-assisted phrasing
 
-## References (tools, not steps)
+**Context:** Profile summary shows the user prefers Chinese, structured expression, and evidence-first reasoning.
 
-- `references/examples.md` — **read first if unsure how to behave** — 9 complete scenarios with correct and incorrect responses
-- `references/question-bank.md` — domain-specific high-signal questions
-- `references/alignment-tree-guide.md` — dimension definitions, defaults, detection hints
-- `references/evidence-policy.md` — source tiers, search rules, privacy gate
+**User:** `$task-clarifier 帮我研究这个工具值不值得用`
+
+**Round 1 (evaluation criteria + output form):**
+
+> "值不值得用"需要先确定判断标准；成本、稳定性、安全性、迁移成本会导向不同结论。这决定了评估的维度和深度。  
+> 我的建议：按"是否解决当前问题、迁移成本、可验证风险"三项评估，优先使用官方文档和本地证据，输出结构化对比。  
+> A) 快速判断能不能用　B) 深度评估长期采用成本　C) 和替代方案对比　D) 告诉我你的想法
+
+---
+
+### Example 3: Task forest global context
+
+**Context:** Task forest shows global task is "Python 2→3 full migration"; current subtask is "auth module migration".
+
+**User:** `$task-clarifier 帮我把 auth.py 的 print 语句改成 print 函数`
+
+**Round 1 (scope + global goal context):**
+
+> 这个修改属于 Python 2→3 迁移任务的一部分。auth.py 中除 print 语句外，还可能存在其他 Python 2 兼容性问题（unicode 字符串、整数除法行为、异常语法等）。这次修改的范围如何定？这决定是否需要反复修改同一个文件。  
+> 我的建议：一并处理 auth.py 中所有 Python 2→3 差异，加快整体迁移进度。  
+> A) 只改 print 语句　B) 顺便处理 auth.py 中所有 Python 2 兼容性问题　C) 告诉我你的想法
+
+---
+
+### Example 4: Confirmation summary format
+
+```
+我的理解如下：
+你需要用 Python 编写一个爬虫，抓取目标网站的100万条历史数据。
+完整性优先，接受分批 + 限速策略，3天内完成。
+验收标准：实际抓取条数达到100万条，记录失败条目以便补抓。
+
+我的推断（请逐条确认）：
+- 我推断目标网站公开可访问（无需登录），因为你未提及账号或认证信息 — 如有偏差请直接纠正
+- 我推断数据存储在本地数据库，因为百万级数据量通常不适合纯文件存储 — 如有偏差请直接纠正
+- 我推断这是一次性历史全量抓取，不需要实时增量更新 — 如有偏差请直接纠正
+
+确认后我会：生成爬虫代码框架（含分批 + 限速逻辑、失败条目记录）。
+有没有我遗漏的？
+```
