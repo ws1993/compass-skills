@@ -11,6 +11,7 @@ import sqlite3
 import sys
 import time
 import uuid
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -20,6 +21,7 @@ SCHEMA_VERSION = 1
 DEFAULT_LOCK_TIMEOUT_SECONDS = 30.0
 DEFAULT_STALE_LOCK_SECONDS = 6 * 60 * 60
 DEAD_PID_GRACE_SECONDS = 2.0
+BROKEN_LOCK_GRACE_SECONDS = 2.0
 DEFAULT_AGENT_WORKBENCH_DB = Path.home() / ".agent-workbench" / "agent-workbench.sqlite3"
 WINDOWS_ERROR_ACCESS_DENIED = 5
 WINDOWS_ERROR_INVALID_PARAMETER = 87
@@ -304,6 +306,14 @@ def stable_event_id() -> str:
     return f"tfevt_{uuid.uuid4().hex[:20]}"
 
 
+@dataclass(frozen=True)
+class LockSnapshot:
+    raw: str
+    metadata: dict[str, Any] | None
+    size: int
+    mtime_ns: int
+
+
 def _classify_posix_kill_outcome(exc: BaseException | None) -> bool | None:
     if exc is None:
         return True
@@ -417,7 +427,12 @@ class FileLock:
                 os.write(self.fd, canonical_json(metadata).encode("utf-8"))
                 os.write(self.fd, b"\n")
                 os.fsync(self.fd)
-                return self
+                # A stale-cleanup race may have removed and recreated the path while we were paused
+                # between open() and the metadata write; only proceed if the live path is still ours.
+                if self._path_token_matches_self():
+                    return self
+                os.close(self.fd)
+                self.fd = None
             except FileExistsError:
                 self._break_stale_lock_if_safe()
                 if time.time() >= deadline:
@@ -437,11 +452,7 @@ class FileLock:
         except OSError:
             return "<无法读取锁文件>"
 
-    def _read_metadata(self) -> dict[str, Any] | None:
-        try:
-            raw = self.path.read_text(encoding="utf-8").strip()
-        except OSError:
-            return None
+    def _parse_metadata(self, raw: str) -> dict[str, Any] | None:
         if not raw:
             return None
         try:
@@ -457,7 +468,30 @@ class FileLock:
                 pid = None
             return {"pid": pid, "started_at": parts[1] if len(parts) > 1 else None, "legacy": True}
 
-    def _lock_age(self, metadata: dict[str, Any]) -> float | None:
+    def _read_snapshot(self) -> LockSnapshot | None:
+        try:
+            before = self.path.stat()
+        except OSError:
+            return None
+        try:
+            raw = self.path.read_text(encoding="utf-8").strip()
+        except OSError:
+            return None
+        try:
+            after = self.path.stat()
+        except OSError:
+            return None
+        if before.st_mtime_ns != after.st_mtime_ns or before.st_size != after.st_size:
+            return None
+        return LockSnapshot(
+            raw=raw,
+            metadata=self._parse_metadata(raw),
+            size=after.st_size,
+            mtime_ns=after.st_mtime_ns,
+        )
+
+    def _lock_age(self, snapshot: LockSnapshot) -> float | None:
+        metadata = snapshot.metadata or {}
         raw = metadata.get("started_at")
         if isinstance(raw, str) and raw:
             try:
@@ -466,10 +500,7 @@ class FileLock:
                 started = None
             if started is not None:
                 return max(0.0, (datetime.now(timezone.utc) - started).total_seconds())
-        try:
-            return max(0.0, time.time() - self.path.stat().st_mtime)
-        except OSError:
-            return None
+        return max(0.0, time.time() - (snapshot.mtime_ns / 1_000_000_000))
 
     def _pid_alive(self, pid: Any) -> bool | None:
         if not isinstance(pid, int) or pid <= 0:
@@ -511,7 +542,18 @@ class FileLock:
         finally:
             close_handle(handle)
 
-    def _best_effort_unlink(self) -> bool:
+    def _snapshot_matches_current(self, snapshot: LockSnapshot) -> bool:
+        current = self._read_snapshot()
+        if current is None:
+            return False
+        token = snapshot.metadata.get("token") if snapshot.metadata else None
+        if isinstance(token, str) and token:
+            return bool(current.metadata and current.metadata.get("token") == token)
+        return current.raw == snapshot.raw and current.size == snapshot.size and current.mtime_ns == snapshot.mtime_ns
+
+    def _best_effort_unlink_snapshot(self, snapshot: LockSnapshot) -> bool:
+        if not self._snapshot_matches_current(snapshot):
+            return False
         try:
             self.path.unlink()
             return True
@@ -520,23 +562,36 @@ class FileLock:
         except OSError:
             return False
 
-    def _break_stale_lock_if_safe(self) -> None:
-        metadata = self._read_metadata()
-        age = self._lock_age(metadata or {})
+    def _path_token_matches_self(self) -> bool:
+        snapshot = self._read_snapshot()
+        return bool(snapshot and snapshot.metadata and snapshot.metadata.get("token") == self.token)
+
+    def _stale_cleanup_reason(self, snapshot: LockSnapshot) -> str | None:
+        age = self._lock_age(snapshot)
         if age is None:
+            return None
+        if snapshot.metadata is None:
+            return "broken_lock" if age >= BROKEN_LOCK_GRACE_SECONDS else None
+        pid_alive = self._pid_alive(snapshot.metadata.get("pid"))
+        if pid_alive is False and age >= DEAD_PID_GRACE_SECONDS:
+            return "dead_pid"
+        if age >= self.stale_seconds:
+            return "lease_expired"
+        return None
+
+    def _break_stale_lock_if_safe(self) -> None:
+        snapshot = self._read_snapshot()
+        if snapshot is None:
             return
-        pid_alive = self._pid_alive(metadata.get("pid")) if metadata else None
-        dead_pid_stale = pid_alive is False and age >= DEAD_PID_GRACE_SECONDS
-        lease_expired = age >= self.stale_seconds
-        if not dead_pid_stale and not lease_expired:
+        if self._stale_cleanup_reason(snapshot) is None:
             return
-        self._best_effort_unlink()
+        self._best_effort_unlink_snapshot(snapshot)
 
     def _unlink_if_owned(self) -> None:
-        metadata = self._read_metadata()
-        if not metadata or metadata.get("token") != self.token:
+        snapshot = self._read_snapshot()
+        if not snapshot or not snapshot.metadata or snapshot.metadata.get("token") != self.token:
             return
-        self._best_effort_unlink()
+        self._best_effort_unlink_snapshot(snapshot)
 
 
 class Store:

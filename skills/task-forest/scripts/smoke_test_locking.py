@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import os
+import sys
 import tempfile
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -18,12 +19,14 @@ def import_module(path: Path, name: str) -> Any:
     if spec is None or spec.loader is None:
         raise RuntimeError(f"Cannot load module: {path}")
     module = importlib.util.module_from_spec(spec)
+    sys.modules[name] = module
     spec.loader.exec_module(module)
     return module
 
 
-def age_file(path: Path, *, hours: float) -> None:
-    timestamp = (datetime.now(timezone.utc) - timedelta(hours=hours)).timestamp()
+def age_file(path: Path, *, hours: float | None = None, seconds: float | None = None) -> None:
+    delta = timedelta(hours=hours or 0, seconds=seconds or 0)
+    timestamp = (datetime.now(timezone.utc) - delta).timestamp()
     os.utime(path, (timestamp, timestamp))
 
 
@@ -63,11 +66,25 @@ def main() -> int:
         broken._break_stale_lock_if_safe()
         assert not broken_lock.exists(), "non-dict JSON lock should be removed via mtime fallback"
 
+        fresh_broken_lock = root / "fresh-broken.lock"
+        fresh_broken_lock.write_text("", encoding="utf-8")
+        age_file(fresh_broken_lock, seconds=task_forest.BROKEN_LOCK_GRACE_SECONDS / 2)
+        fresh_broken = task_forest.FileLock(fresh_broken_lock, timeout=0.1, stale_seconds=60 * 60)
+        fresh_broken._break_stale_lock_if_safe()
+        assert fresh_broken_lock.exists(), "broken lock younger than the grace period should not be removed"
+
+        mature_broken_lock = root / "mature-broken.lock"
+        mature_broken_lock.write_text("", encoding="utf-8")
+        age_file(mature_broken_lock, seconds=task_forest.BROKEN_LOCK_GRACE_SECONDS + 1)
+        mature_broken = task_forest.FileLock(mature_broken_lock, timeout=0.1, stale_seconds=60 * 60)
+        mature_broken._break_stale_lock_if_safe()
+        assert not mature_broken_lock.exists(), "broken lock older than the grace period should be removed quickly"
+
         dead_pid_lock = root / "dead-pid.lock"
         dead_pid_lock.write_text('{"token":"other","pid":999,"started_at":"2026-01-01T00:00:00.000000Z"}\n', encoding="utf-8")
         dead_pid = task_forest.FileLock(dead_pid_lock, timeout=0.1, stale_seconds=60 * 60)
         with mock.patch.object(dead_pid, "_pid_alive", return_value=False), mock.patch.object(
-            dead_pid, "_best_effort_unlink", return_value=True
+            dead_pid, "_best_effort_unlink_snapshot", return_value=True
         ) as cleanup:
             dead_pid._break_stale_lock_if_safe()
             cleanup.assert_called_once()
@@ -77,7 +94,7 @@ def main() -> int:
         age_file(lease_lock, hours=12)
         lease = task_forest.FileLock(lease_lock, timeout=0.1, stale_seconds=10)
         with mock.patch.object(lease, "_pid_alive", return_value=True), mock.patch.object(
-            lease, "_best_effort_unlink", return_value=True
+            lease, "_best_effort_unlink_snapshot", return_value=True
         ) as cleanup:
             lease._break_stale_lock_if_safe()
             cleanup.assert_called_once()
@@ -104,6 +121,16 @@ def main() -> int:
             type(stale_lock), "unlink", side_effect=PermissionError("busy")
         ):
             stale._break_stale_lock_if_safe()
+
+        mutated_lock = root / "mutated.lock"
+        mutated_lock.write_text("", encoding="utf-8")
+        age_file(mutated_lock, seconds=task_forest.BROKEN_LOCK_GRACE_SECONDS + 1)
+        mutated = task_forest.FileLock(mutated_lock, timeout=0.1, stale_seconds=60 * 60)
+        snapshot = mutated._read_snapshot()
+        assert snapshot is not None
+        mutated_lock.write_text('{"token":"other","pid":1,"started_at":"2026-01-01T00:00:00.000000Z"}\n', encoding="utf-8")
+        assert mutated._best_effort_unlink_snapshot(snapshot) is False
+        assert mutated_lock.exists(), "cleanup should not delete a lock that changed after observation"
 
     print("ok=task-forest locking smoke test passed")
     return 0

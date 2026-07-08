@@ -165,9 +165,9 @@ DAG 关系视图：
 - **目标关系**：当前任务和原始目的之间的贡献关系，以及是否出现偏移。
 - **续接上下文**：新 AI 对话需要知道什么，才能不重放完整聊天记录也能继续推进。
 
-COMPASS 提供一套长期协作流程：先读取用户协作画像，再查看任务森林，需要换 AI 对话时生成续接 prompt，最后在行动前完成目标对齐。
+COMPASS 提供一套长期协作和 skill 演进流程：先读取用户协作画像，再查看任务森林，需要换 AI 对话时生成续接 prompt，在行动前完成目标对齐；当某条流程已经跑通、值得沉淀，或某个现有 skill 需要根据真实运行证据升级时，再进入 `run-history` 双 skill。
 
-## 四层模型
+## 四层协作模型 + 两个 run-history 工程 skills
 
 | 层 | Skill | 解决的问题 |
 | --- | --- | --- |
@@ -175,6 +175,8 @@ COMPASS 提供一套长期协作流程：先读取用户协作画像，再查看
 | **知事** | [`$task-forest`](skills/task-forest/) | 在 repo 内维护任务森林 / DAG，记录长期目标、子任务、依赖、进度、偏差、todo 和历史快照。 |
 | **知续** | [`$session-handoff-prompt`](skills/session-handoff-prompt/) | 把当前对话里真正需要延续的目标、进展、约束和下一步，压缩成可直接复制给新 AI 对话的提示词。 |
 | **知向** | [`$task-clarifier`](skills/task-clarifier/) | 把模糊需求对齐成三方一致的执行契约：用户想清楚、agent 听准确、用户能确认没跑偏。 |
+| **造技** | [`$run-history-skill-builder`](skills/run-history-skill-builder/) | 把已经跑通或反复打磨过的真实流程，抽成新的可复用 skill 包，或先生成不落文件的设计方案。 |
+| **修技** | [`$run-history-skill-upgrader`](skills/run-history-skill-upgrader/) | 根据真实失败、验证结果和用户反馈，为已有 skill 先产出结构化升级方案，再在明确批准后执行修改。 |
 
 一句话理解：
 
@@ -183,6 +185,8 @@ $user-profile-keeper 让 AI 知道“你是谁、怎么协作”。
 $task-forest 让 AI 知道“任务在哪里、做到哪里、为什么做，以及有没有偏离总的目标”。
 $session-handoff-prompt 让 AI 知道“新对话怎样像接着原来的对话继续做事”。
 $task-clarifier 让 AI 知道“用户的需求到底是什么”。
+$run-history-skill-builder 让 AI 知道“这条已经跑通的流程怎样被沉淀成新的 skill”。
+$run-history-skill-upgrader 让 AI 知道“现有 skill 怎样根据真实运行证据被安全升级”。
 ```
 
 ## 生态图
@@ -203,8 +207,8 @@ COMPASS 是一个 agent-agnostic 的 `SKILL.md` skills 包：凡是支持 `SKILL
 
 | Agent / 环境 | 推荐接入方式 |
 | --- | --- |
-| Codex | 复制 `skills/` 下的四个目录到 Codex 可发现的 skills 目录，或作为 repo-local skills 使用。 |
-| Claude Code | 复制 `skills/` 下的四个目录到 Claude Code 的 custom skills 目录，或放入项目 skills 根目录。 |
+| Codex | 复制 `skills/` 下需要的 released skill 目录到 Codex 可发现的 skills 目录，或作为 repo-local skills 使用；当前公开版共 6 个 skills。 |
+| Claude Code | 复制 `skills/` 下需要的 released skill 目录到 Claude Code 的 custom skills 目录，或放入项目 skills 根目录；当前公开版共 6 个 skills。 |
 | OpenClaw | 放入 workspace `skills/`、`.agents/skills` 或个人/托管 skills 目录；按 OpenClaw 的 skill precedence 生效。 |
 | OpenCode | 保留本 repo 的 `skills/` 和 [AGENTS.md](AGENTS.md)，让 agent 通过 AGENTS 规则发现并读取对应 `SKILL.md`。 |
 | 其他 agent | 只要能读取文件并运行本地脚本，就按 [AGENTS.md](AGENTS.md) 的通用协议加载：先读 `SKILL.md`，再按需读 `references/` 和运行 `scripts/`。 |
@@ -229,7 +233,7 @@ Repo: https://github.com/dongshuyan/compass-skills
 6. 最后报告安装位置、已安装 skills、安全检查结果、验证结果，以及如何在 AI 对话中调用。
 ```
 
-手动安装时，把 `skills/` 下的四个目录复制到目标 agent 的本地 skills 目录，然后在 AI 对话中点名使用：
+手动安装时，把 `skills/` 下需要的 released skill 目录复制到目标 agent 的本地 skills 目录；当前公开版共 6 个 skills。安装后可在 AI 对话中点名使用：
 
 ```text
 $user-profile-keeper
