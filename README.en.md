@@ -20,9 +20,9 @@
 npx skills add dongshuyan/compass-skills --skill '*' -a claude-code
 ```
 
-COMPASS Skills gives AI coding agents six local skills: four runtime collaboration skills plus two run-history skill-engineering skills.
+COMPASS Skills gives AI agents seven local skills: four runtime collaboration skills, two run-history skill-engineering skills, and one fact-preserving academic writing skill.
 
-The project currently ships six `SKILL.md` skills:
+The project currently ships seven `SKILL.md` skills:
 
 | Skill | Purpose |
 | --- | --- |
@@ -32,8 +32,9 @@ The project currently ships six `SKILL.md` skills:
 | [`user-profile-keeper`](skills/user-profile-keeper/) | Maintains a local, auditable, correctable collaboration profile for communication preferences, risk style, and recurring working context. |
 | [`run-history-skill-builder`](skills/run-history-skill-builder/) | Turns completed or repeatedly refined run history into a new reusable skill package or a reviewed skill-design plan. |
 | [`run-history-skill-upgrader`](skills/run-history-skill-upgrader/) | Automatically turns session evidence from real execution, encountered and resolved difficulties, validation results, and user feedback into an upgrade plan for an existing skill, forming the simplest controlled self-evolution loop; it applies changes only after explicit approval. |
+| [`academic-humanizer`](skills/academic-humanizer/) | Drafts, audits, or minimally revises English and Chinese academic prose while preserving claims, evidence strength, logical relations, and scholarly register. |
 
-For multi-skill repositories, install only the functions you actually need. The `run-history` pair is mainly for people creating or maintaining other skills.
+For multi-skill repositories, install only the functions you actually need. The `run-history` pair supports skill engineering; `academic-humanizer` supports fact-preserving academic writing and editing.
 
 ## Quick Start
 
@@ -64,9 +65,10 @@ $session-handoff-prompt
 $user-profile-keeper
 $run-history-skill-builder
 $run-history-skill-upgrader
+$academic-humanizer
 ```
 
-For manual installation, copy the six folders under [`skills/`](skills/) into the agent's local skills directory and keep their `references/`, `scripts/`, `evals/`, and `agents/` subdirectories intact.
+For manual installation, copy the seven folders under [`skills/`](skills/) into the agent's local skills directory and keep their `references/`, `scripts/`, `evals/`, and `agents/` subdirectories intact.
 
 ## Why COMPASS Exists
 
@@ -98,6 +100,8 @@ COMPASS organizes that state into four local workflows:
 
 `run-history-skill-upgrader` takes the next step for existing skills: it automatically reads session evidence from real execution, encountered and resolved difficulties, validation results, and user feedback, then produces a concrete upgrade plan and stops. Only after explicit approval of that plan does it edit files. In practice, this is the simplest controlled self-evolution loop for skills: periodically run a target skill, accumulate real session evidence, then let the upgrader turn that evidence into a reviewed upgrade plan and, after approval, an applied change.
 
+`academic-humanizer` repairs formulaic, vacuous, mechanically repetitive, or process-leaking academic prose without adding facts or weakening the source argument. It supports English and Chinese, protects quotations, formulas, citations, technical names, modality, and scope, and treats zero edits as a valid result when the prose is already sound.
+
 ```text
 user-profile-keeper    -> who is the user and how should we collaborate?
 task-forest            -> where does this task fit and is it still aligned?
@@ -105,6 +109,7 @@ session-handoff-prompt -> what should the next AI conversation know to continue 
 task-clarifier         -> what should the agent do now?
 run-history-skill-builder  -> how do we package this proven workflow as a new skill?
 run-history-skill-upgrader -> how does a skill self-evolve safely from real session evidence?
+academic-humanizer         -> how do we improve academic prose without changing its claims?
 ```
 
 ## Task Clarifier Example
@@ -229,6 +234,7 @@ COMPASS keeps runtime data local:
 - `user-profile-keeper` stores local profile data under `.compass-skills/user-profiles/v1` by default, or a user-selected `COMPASS_USER_PROFILE_HOME`.
 - `run-history-skill-builder` reads only user-authorized workflow history and writes new skill files only to a user-approved local directory.
 - `run-history-skill-upgrader` is plan-only by default. It can synthesize real session evidence into an upgrade plan automatically, but it enables a controlled self-evolution loop only after explicit approval of a concrete plan.
+- `academic-humanizer` preserves source claims and locked spans, never invents facts or citations, and uses its Python script only for optional read-only diagnostics.
 - High-risk actions such as deletion, overwrite, publishing, remote writes, credential use, and global configuration changes require explicit confirmation.
 
 Important: `user-profile-keeper` uses local plaintext storage without encryption. Do not store passwords, tokens, private keys, verification codes, or highly sensitive personal data in the profile.
@@ -309,6 +315,16 @@ Boundaries:
 4. Report what was saved, proposed, skipped, or redacted.
 ```
 
+Revise academic prose without changing its claims:
+
+```text
+Use $academic-humanizer to minimally revise the academic passage below.
+
+Preserve every claim, number, citation, comparison, hedge, causal relation, and scope boundary. Keep quotations, formulas, code, references, statistical notation, proper nouns, and requested verbatim text unchanged. Remove only unsupported, vacuous, mechanically repetitive, or process-leaking wording. Return the clean revised passage without an editor preface.
+
+Passage: ...
+```
+
 ## Validation Status
 
 The public install path has been validated with `skills@1.5.11`:
@@ -316,6 +332,7 @@ The public install path has been validated with `skills@1.5.11`:
 - `npx skills add dongshuyan/compass-skills --list` finds the released skills.
 - `npx skills add dongshuyan/compass-skills --skill '*' -a claude-code --copy -y` installs the released skills into a temporary project's `.claude/skills/` directory.
 - `python3 skills/session-handoff-prompt/scripts/smoke_test_handoff.py --skill-dir skills/session-handoff-prompt` validates compacted-event projection, task-forest read-only summaries, local validation, and shareable redaction.
+- `printf '%s\n' 'Samples were randomized.' | python3 skills/academic-humanizer/scripts/metrics.py - --json` provides read-only descriptive diagnostics for language routing, process leaks, and contrast candidates without assigning an authorship or quality score.
 
 ## Roadmap
 

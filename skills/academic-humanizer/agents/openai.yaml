@@ -1,0 +1,4 @@
+interface:
+  display_name: "Academic Humanizer"
+  short_description: "Fact-preserving English and Chinese academic prose editor"
+  default_prompt: "Use $academic-humanizer to revise this academic passage while preserving every claim and its evidence strength."

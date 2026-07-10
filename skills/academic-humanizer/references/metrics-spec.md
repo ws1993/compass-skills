@@ -1,0 +1,76 @@
+# Metrics specification
+
+`scripts/metrics.py` provides reproducible descriptive diagnostics. It does not
+identify an author, assign an AI probability, or decide whether prose passes.
+
+## Routing
+
+Routing is based on editable prose after removing fenced/inline code, formulas,
+Markdown block quotations, and a trailing References/Bibliography/Works
+Cited/参考文献 section. Reference headings are normalized before matching:
+case, Markdown heading marks, an optional section number, surrounding whitespace,
+and a trailing ASCII or full-width colon do not affect recognition. Ordinary
+sentences that merely begin with `References` or `参考文献` remain prose.
+
+`r = CJK tokens / (CJK tokens + Latin word tokens)`
+
+Each CJK character is one orthographic token; each contiguous Latin word is one
+token. This practical tokenizer favors the surrounding Chinese grammar over a
+few long embedded technical names. `r >= 0.5` routes Chinese; otherwise English.
+No countable prose returns `unknown` rather than defaulting to English.
+
+## Descriptive fields
+
+| Field | Unit | Interpretation limit |
+|---|---|---|
+| `lexical_diversity` | English word TTR or Chinese character diversity plus token count | length-sensitive description; no normal range |
+| `sentence_length` | word count (EN) or CJK characters + Latin words (ZH) | descriptive mean, spread, min, max |
+| `transitions` | sentence-initial candidates per 100 sentences | high or low values are not defects by themselves |
+| `passive_candidates` | conservative English sentence candidates | misses valid passives and may retain false positives; never a style target |
+| `dashes` | mutually exclusive glyph/pair counts | punctuation inventory only |
+| `leaks` | context-bearing regex candidates | quotations are masked; selected research-mention contexts are excluded; contextual review remains required |
+| `contrast_candidates` | pattern candidates | candidate only; use `contrast-logic.md` for the decision |
+
+Chinese character diversity is not lexical TTR. Traditional TTR is sensitive to
+text length, so values from different lengths or languages are not comparable.
+
+## Protected-span masking
+
+Leak and contrast scans mask direct quotations, fenced/inline code, formulas,
+Markdown block quotations, and trailing references. This reduces false positives
+but cannot parse every document format. Findings remain candidates.
+
+Chinese process-leak rules distinguish three cases:
+
+- a direct second-person request cue, such as `根据您的要求`;
+- a generic request cue followed by a document target or editing action;
+- an AI-style self-reference cue, excluding quoted and explicitly discussed
+  research examples.
+
+These distinctions improve candidate recall without turning a match into deletion
+authority.
+
+## Prohibited interpretations
+
+Do not:
+
+- combine fields into a score or probability;
+- claim a universal healthy range;
+- rewrite until a threshold is crossed;
+- treat passive voice, transitions, sentence variance, or dashes as defects alone;
+- use a regex candidate as automatic deletion evidence.
+
+## Optional runtime commands
+
+The skill remains fully usable without Python. When Python 3 is available, let
+`<python>` be the host's launcher, `<skill-dir>` the directory containing
+`SKILL.md`, and `<input-file>` a user-authorized text file. Quote paths containing
+spaces and use the path separator accepted by the host shell.
+
+```bash
+<python> "<skill-dir>/scripts/metrics.py" "<input-file>" --json
+<python> "<skill-dir>/scripts/metrics.py" "<input-file>" --route
+```
+
+The first command returns all descriptive fields. The second returns only the
+language route. These commands do not modify the input file.

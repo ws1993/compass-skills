@@ -19,6 +19,13 @@
         "run-history-skill-builder",
         "run-history-skill-upgrader"
       ]
+    },
+    {
+      "title": "Academic Writing",
+      "description": "Fact-preserving drafting, auditing, and minimal revision for English and Chinese academic prose.",
+      "skills": [
+        "academic-humanizer"
+      ]
     }
   ]
 }
